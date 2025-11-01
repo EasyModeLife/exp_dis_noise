@@ -624,7 +624,8 @@ elements.customNoiseInput.addEventListener('input', (e) => {
 });
 
 function checkStartButton() {
-    const hasParticipantName = state.participantName.trim().length > 0;
+    const participantNameValue = elements.participantNameInput ? elements.participantNameInput.value.trim() : '';
+    const hasParticipantName = participantNameValue.length > 0;
     const hasListAndNoise = state.listId && state.noiseLevel !== null;
     elements.startExperimentBtn.disabled = !(hasParticipantName && hasListAndNoise);
 }
