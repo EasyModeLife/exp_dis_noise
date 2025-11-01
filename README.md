@@ -23,7 +23,7 @@ Este experimento evalúa la capacidad de reconocimiento auditivo de palabras cua
 
 ## 🌐 Aplicación en Vivo
 
-**🚀 URL de producción**: https://8f0630dd.exp-dis-noise.pages.dev
+**🚀 URL de producción**: https://28200ea8.exp-dis-noise.pages.dev
 
 La aplicación está completamente funcional con los 90 audios generados y lista para ser utilizada.
 
@@ -149,6 +149,7 @@ El ruido blanco se genera dinámicamente y se mezcla con el audio de las palabra
 ## 🧪 Uso del Experimento
 
 1. **Configurar**: 
+   - **Ingresa el nombre del participante** (obligatorio)
    - Selecciona una lista de palabras (6 opciones)
    - Selecciona un nivel de ruido:
      - Predefinidos: 0%, 33.33%, 70.79%, 79.43%, 84.14%, 89.13%, 100%, 112.20%
@@ -173,6 +174,12 @@ El ruido blanco se genera dinámicamente y se mezcla con el audio de las palabra
    - Cantidad de respuestas correctas e incorrectas
    - Porcentaje de precisión
    - Detalle de cada palabra con su tiempo y resultado
+
+7. **Copiar Resultados**: Al presionar "Copiar Resultados", se incluye:
+   - Nombre del participante
+   - Fecha y hora del experimento (automática)
+   - Lista y nivel de ruido utilizados
+   - Todos los resultados detallados
 
 ## 🛠️ Tecnologías
 
