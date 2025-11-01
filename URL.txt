@@ -1,0 +1,17 @@
+URL del Proyecto en Cloudflare Pages:
+========================================
+
+URL esperada: https://exp-dis-noise.pages.dev
+
+Notas:
+- Esta URL se genera automáticamente cuando se despliega el proyecto en Cloudflare Pages
+- Si el nombre del proyecto ya está en uso, Cloudflare puede asignar una URL diferente
+- Puedes verificar la URL exacta en el dashboard de Cloudflare después del despliegue
+- La URL puede ser personalizada con un dominio propio si lo configuras
+
+Para verificar o hacer el despliegue:
+1. Ve a https://dash.cloudflare.com/
+2. Navega a Workers & Pages → Pages
+3. Busca el proyecto "exp_dis_noise" o créalo si no existe
+4. La URL estará visible en la página del proyecto
+

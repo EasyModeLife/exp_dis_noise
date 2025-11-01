@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experimento de Discriminación con Ruido</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Experimento de Discriminación con Ruido</h1>
+        
+        <div class="selection-section">
+            <h2>Selección de Audio</h2>
+            <label for="audio-select">Selecciona el audio:</label>
+            <select id="audio-select">
+                <option value="">-- Selecciona una opción --</option>
+            </select>
+        </div>
+
+        <div class="experiment-section" id="experiment-section" style="display: none;">
+            <div class="progress-info">
+                <p>Palabra <span id="current-word-number">0</span> de 15</p>
+                <p>Tiempo acumulado: <span id="total-time">0.00</span> segundos</p>
+            </div>
+
+            <div class="timer-display">
+                <p>Tiempo de palabra actual: <span id="current-time">0.00</span> segundos</p>
+            </div>
+
+            <div class="controls">
+                <button id="play-button" class="btn btn-primary">Reproducir Palabra</button>
+                <button id="stop-timer-button" class="btn btn-secondary" disabled>Detener Temporizador</button>
+                <button id="reset-button" class="btn btn-danger">Reiniciar Experimento</button>
+            </div>
+
+            <div class="word-list">
+                <h3>Palabras Procesadas:</h3>
+                <ul id="word-times-list"></ul>
+            </div>
+        </div>
+
+        <div class="results-section" id="results-section" style="display: none;">
+            <h2>Resultados Finales</h2>
+            <p class="total-result">Tiempo total acumulado: <span id="final-time">0.00</span> segundos</p>
+            <button id="new-experiment-button" class="btn btn-primary">Nuevo Experimento</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+

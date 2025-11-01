@@ -1,0 +1,22 @@
+{
+  "name": "exp_dis_noise",
+  "version": "1.0.0",
+  "description": "Experimento de discriminación auditiva con ruido blanco",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx wrangler pages dev",
+    "deploy": "wrangler pages deploy ."
+  },
+  "keywords": [
+    "experiment",
+    "audio",
+    "psychology",
+    "noise"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
+
