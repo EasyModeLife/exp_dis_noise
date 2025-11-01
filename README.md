@@ -23,7 +23,7 @@ Este experimento evalúa la capacidad de reconocimiento auditivo de palabras cua
 
 ## 🌐 Aplicación en Vivo
 
-**🚀 URL de producción**: https://ffbc3673.exp-dis-noise.pages.dev
+**🚀 URL de producción**: https://8f0630dd.exp-dis-noise.pages.dev
 
 La aplicación está completamente funcional con los 90 audios generados y lista para ser utilizada.
 
@@ -150,15 +150,18 @@ El ruido blanco se genera dinámicamente y se mezcla con el audio de las palabra
 
 1. **Configurar**: 
    - Selecciona una lista de palabras (6 opciones)
-   - Selecciona un nivel de ruido (8 opciones: 0%, 33.33%, 70.79%, 79.43%, 84.14%, 89.13%, 100%, 112.20%)
+   - Selecciona un nivel de ruido:
+     - Predefinidos: 0%, 33.33%, 70.79%, 79.43%, 84.14%, 89.13%, 100%, 112.20%
+     - **Personalizado**: Ingresa cualquier valor (ej: 25.6, 99.2, 200)
 
 2. **Iniciar**: Presiona "Iniciar Experimento en Pantalla Completa"
 
-3. **Reproducir**: Presiona el botón verde "Reproducir"
+3. **Reproducir**: Presiona el botón "Reproducir"
    - El audio de la palabra se reproduce con ruido blanco superpuesto
    - El temporizador inicia automáticamente al comenzar el audio
+   - Puedes pausar en cualquier momento presionando el mismo botón (el timer se detendrá)
 
-4. **Responder**: Cuando reconozcas la palabra, presiona el botón correspondiente:
+4. **Responder**: Al pausar o terminar el audio, presiona el botón correspondiente:
    - **Verde (✓)** si identificaste correctamente la palabra
    - **Rojo (✗)** si no pudiste identificarla o te equivocaste
    - El temporizador se detiene y avanza automáticamente a la siguiente palabra
