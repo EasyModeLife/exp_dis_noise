@@ -1,100 +1,287 @@
-# Experimento de Discriminación con Ruido
+# Experimento de Discriminación Auditiva con Ruido
 
-Aplicación web para experimento de discriminación auditiva con ruido blanco. Permite reproducir listas de palabras mezcladas con ruido blanco a diferentes niveles de volumen y medir el tiempo de respuesta del usuario.
+Aplicación web para realizar experimentos de discriminación auditiva de palabras en presencia de ruido blanco a diferentes niveles de intensidad.
 
-## Características
+## 🎯 Descripción
 
-- 6 listas de palabras (2 de 3 sílabas, 2 de 4 sílabas, 2 de 5 sílabas)
-- 3 niveles de ruido por lista (100%, 84.1395%, 70.7946%)
-- Reproducción palabra por palabra con ruido blanco mezclado
-- Temporizador automático que inicia al terminar cada palabra
-- Almacenamiento de tiempos individuales y tiempo total acumulado
+Este experimento evalúa la capacidad de reconocimiento auditivo de palabras cuando se presentan simultáneamente con ruido blanco. El sistema utiliza:
 
-## Uso
+- **6 listas de palabras** (2 de 3 sílabas, 2 de 4 sílabas, 2 de 5 sílabas)
+- **6 niveles de ruido** (del 70.79% al 112.20% del volumen de las palabras)
+- **36 combinaciones totales** para probar diferentes condiciones experimentales
 
-1. Selecciona uno de los 18 audios disponibles (6 listas × 3 niveles de ruido)
-2. Presiona "Reproducir Palabra" para escuchar la primera palabra
-3. Al terminar la palabra, el temporizador se inicia automáticamente
-4. Presiona "Detener Temporizador" cuando estés listo
-5. Repite el proceso para las 15 palabras
-6. Al finalizar, se muestra el tiempo total acumulado
+## ✨ Características
 
-## Tecnologías
+- ✅ Reproducción de palabras individuales con ruido blanco superpuesto
+- ✅ Temporizador que inicia automáticamente al comenzar la reproducción
+- ✅ Control manual para detener el temporizador (permite reconocimiento anticipado)
+- ✅ Almacenamiento de tiempos de respuesta individuales
+- ✅ Cálculo de tiempo total acumulado
+- ✅ Generación dinámica de ruido blanco mediante Web Audio API
+- ✅ Interfaz moderna y responsiva
+- ✅ 36 combinaciones de audio predefinidas
 
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Web Audio API
-- Web Speech API (Speech Synthesis)
+## 🚀 Inicio Rápido
 
-## Requisitos
+### Desarrollo Local
 
-- Navegador moderno con soporte para Web Audio API y Speech Synthesis API
-- Chrome, Firefox, Edge o Safari actualizados
-
-## Instalación Local
-
-1. Clona el repositorio:
+1. **Clonar el repositorio**:
 ```bash
-git clone https://github.com/tu-usuario/exp_dis_noise.git
+git clone https://github.com/EasyModeLife/exp_dis_noise.git
 cd exp_dis_noise
 ```
 
-2. Abre `index.html` en tu navegador o usa un servidor local:
+2. **Iniciar servidor de desarrollo con Wrangler**:
 ```bash
-python -m http.server 8000
-# o
-npx serve
+bunx wrangler pages dev .
 ```
 
-## Despliegue
+3. **Abrir en el navegador**:
+   - La aplicación estará disponible en `http://localhost:8788`
 
-### URL del Proyecto
+### Despliegue a Cloudflare Pages
 
-**URL esperada:** https://exp-dis-noise.pages.dev
+#### Método 1: Despliegue Manual con Wrangler
 
-(La URL puede variar según la configuración de Cloudflare. Verifica en el dashboard para la URL exacta)
-
-### Cloudflare Pages (Recomendado)
-
-1. Ve a [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Selecciona "Pages" en el menú
-3. Conecta tu repositorio de GitHub
-4. Configura el build:
-   - Framework preset: None
-   - Build command: (dejar vacío)
-   - Build output: `.`
-5. Despliega
-
-O usa el script de despliegue:
 ```bash
-./deploy.sh
+# Asegúrate de estar autenticado
+bunx wrangler login
+
+# Desplegar a Cloudflare Pages
+bunx wrangler pages deploy . --project-name=exp-dis-noise
 ```
 
-### Usando Wrangler CLI
+#### Método 2: GitHub Actions (Automático)
 
-1. Instala Wrangler:
+El proyecto incluye configuración de GitHub Actions para despliegue automático en cada push a `main`.
+
+1. Configura los siguientes secrets en tu repositorio de GitHub:
+   - `CLOUDFLARE_API_TOKEN`: Token de API de Cloudflare con permisos de Pages
+   - `CLOUDFLARE_ACCOUNT_ID`: ID de tu cuenta de Cloudflare
+
+2. Haz push a la rama `main`:
 ```bash
-npm install -g wrangler
+git add .
+git commit -m "Desplegar aplicación"
+git push origin main
 ```
 
-2. Autentica:
-```bash
-wrangler login
+3. GitHub Actions desplegará automáticamente a Cloudflare Pages
+
+## 📁 Estructura del Proyecto
+
+```
+exp_dis_noise/
+├── public/
+│   └── audio/
+│       └── words/
+│           ├── lista1-3sil/       # 15 palabras de 3 sílabas (Lista 1)
+│           ├── lista2-3sil/       # 15 palabras de 3 sílabas (Lista 2)
+│           ├── lista1-4sil/       # 15 palabras de 4 sílabas (Lista 1)
+│           ├── lista2-4sil/       # 15 palabras de 4 sílabas (Lista 2)
+│           ├── lista1-5sil/       # 15 palabras de 5 sílabas (Lista 1)
+│           └── lista2-5sil/       # 15 palabras de 5 sílabas (Lista 2)
+├── index.html                      # Interfaz principal
+├── styles.css                      # Estilos de la aplicación
+├── app.js                          # Lógica del experimento
+├── wrangler.toml                   # Configuración de Cloudflare Pages
+├── INSTRUCTIONS.md                 # Instrucciones detalladas del experimento
+└── README.md                       # Este archivo
 ```
 
-3. Despliega:
-```bash
-wrangler pages deploy .
+## 🎵 Generación de Audios con ElevenLabs
+
+Los archivos de audio deben generarse con ElevenLabs y colocarse en las carpetas correspondientes:
+
+### Estructura de Archivos de Audio
+
+Cada lista debe contener 15 archivos de audio nombrados como `palabra01.mp3` hasta `palabra15.mp3`:
+
+```
+public/audio/words/lista1-3sil/
+├── palabra01.mp3  (Obstante)
+├── palabra02.mp3  (Brújula)
+├── palabra03.mp3  (Guitarra)
+...
+└── palabra15.mp3  (Séquito)
 ```
 
-### Variables de Entorno
+### Palabras por Lista
 
-Para el despliegue automático con GitHub Actions, necesitas configurar estos secrets en tu repositorio:
-- `CLOUDFLARE_API_TOKEN`: Token de API de Cloudflare
-- `CLOUDFLARE_ACCOUNT_ID`: ID de tu cuenta de Cloudflare
+Las palabras completas para cada lista están documentadas en el archivo [`INSTRUCTIONS.md`](./INSTRUCTIONS.md).
 
-## Licencia
+**Resumen:**
+- **Lista 1 (3 sílabas)**: Obstante, Brújula, Guitarra, Comida, Fábula, etc.
+- **Lista 2 (3 sílabas)**: Palabra, Número, Mercado, Ventana, Insignia, etc.
+- **Lista 1 (4 sílabas)**: Restaurante, Bolígrafo, Efímero, Importante, etc.
+- **Lista 2 (4 sílabas)**: Teléfono, Bicicleta, Simpático, Pentagrama, etc.
+- **Lista 1 (5 sílabas)**: Especialista, Universidad, Laboratorio, etc.
+- **Lista 2 (5 sílabas)**: Investigación, Estrafalario, Especulación, etc.
 
-MIT
+### Configuración Recomendada para ElevenLabs
+
+- **Formato**: MP3
+- **Voz**: Voz clara en español (recomendado: voz neutral sin acentos marcados)
+- **Velocidad**: Normal
+- **Calidad**: Alta definición
+
+## 🎚️ Niveles de Ruido
+
+El ruido blanco se genera dinámicamente y se mezcla con el audio de las palabras a los siguientes niveles:
+
+| Nivel | Porcentaje | Descripción |
+|-------|-----------|-------------|
+| 1 | 112.20% | Ruido más alto que las palabras |
+| 2 | 100% | Ruido igual al volumen de las palabras |
+| 3 | 89.13% | Ruido ligeramente menor |
+| 4 | 84.14% | Ruido moderadamente menor |
+| 5 | 79.43% | Ruido notablemente menor |
+| 6 | 70.79% | Ruido significativamente menor |
+
+## 🧪 Uso del Experimento
+
+1. **Seleccionar Audio**: Elige una de las 36 combinaciones disponibles (lista + nivel de ruido)
+
+2. **Reproducir Palabra**: Presiona el botón "Reproducir Palabra"
+   - El audio de la palabra se reproduce con ruido blanco superpuesto
+   - El temporizador inicia automáticamente
+
+3. **Detener Temporizador**: Presiona "Detener Temporizador" cuando reconozcas la palabra
+   - Puedes detenerlo antes de que termine el audio si reconoces la palabra anticipadamente
+   - El tiempo se guarda automáticamente
+
+4. **Continuar**: Repite el proceso para las 15 palabras de la lista
+
+5. **Resultados**: Al finalizar, se muestra el tiempo total acumulado
+
+## 🛠️ Tecnologías
+
+- **HTML5**: Estructura de la aplicación
+- **CSS3**: Diseño moderno y responsivo
+- **JavaScript (ES6+)**: Lógica del experimento
+- **Web Audio API**: Generación de ruido blanco y control de audio
+- **Cloudflare Pages**: Hosting y despliegue
+- **Wrangler**: CLI para gestión de Cloudflare
+- **Bun**: Runtime y gestor de paquetes
+
+## 📋 Requisitos
+
+### Para Desarrollo Local
+- Bun instalado (`curl -fsSL https://bun.sh/install | bash`)
+- Navegador moderno (Chrome, Firefox, Edge, Safari actualizados)
+
+### Para Despliegue
+- Cuenta de Cloudflare
+- Wrangler CLI (instalado con `bun add -g wrangler`)
+
+## 🔧 Configuración de Cloudflare
+
+### Obtener Credenciales
+
+1. **API Token**:
+   - Ve a [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
+   - Crea un token con permisos de "Cloudflare Pages:Edit"
+   
+2. **Account ID**:
+   - Ve a tu dashboard de Cloudflare
+   - Selecciona tu sitio web
+   - El Account ID está en la barra lateral derecha
+
+### Autenticación Local
+
+```bash
+bunx wrangler login
+```
+
+Esto abrirá tu navegador para autenticarte con Cloudflare.
+
+## 📝 Control de Versiones con Git
+
+### Configuración Inicial
+
+```bash
+# Inicializar repositorio (si no está inicializado)
+git init
+
+# Añadir archivos
+git add .
+
+# Commit inicial
+git commit -m "Configuración inicial del experimento de discriminación auditiva"
+
+# Conectar con repositorio remoto
+git remote add origin https://github.com/EasyModeLife/exp_dis_noise.git
+
+# Push a GitHub
+git push -u origin main
+```
+
+### Flujo de Trabajo
+
+```bash
+# Hacer cambios
+git add .
+git commit -m "Descripción de cambios"
+git push
+
+# El despliegue se realizará automáticamente con GitHub Actions
+```
+
+## 🐛 Solución de Problemas
+
+### Los audios no se reproducen
+
+- **Verifica que los archivos de audio existan** en `/public/audio/words/`
+- Los nombres deben seguir el formato: `palabraXX.mp3` (ejemplo: `palabra01.mp3`)
+- Verifica la consola del navegador para ver errores específicos
+
+### El temporizador no inicia
+
+- Asegúrate de seleccionar un audio antes de presionar "Reproducir Palabra"
+- Verifica que el navegador tenga permisos para reproducir audio
+
+### Error de despliegue en Cloudflare
+
+```bash
+# Verificar autenticación
+bunx wrangler whoami
+
+# Si no está autenticado
+bunx wrangler login
+
+# Intentar despliegue nuevamente
+bunx wrangler pages deploy . --project-name=exp-dis-noise
+```
+
+## 📊 Datos Recolectados
+
+El experimento recolecta:
+
+- ✅ Tiempo de respuesta individual para cada palabra (en segundos con 3 decimales)
+- ✅ Tiempo total acumulado para las 15 palabras
+- ✅ Lista y nivel de ruido utilizados
+
+**Nota**: Los datos actualmente solo se muestran en pantalla. Para almacenamiento persistente, considera integrar una base de datos (Cloudflare D1, Supabase, etc.).
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
+
+## 📧 Contacto
+
+Para preguntas o sugerencias sobre el experimento, abre un issue en el repositorio de GitHub.
+
+---
+
+**Desarrollado con ❤️ para la investigación en discriminación auditiva**
 

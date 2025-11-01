@@ -3,53 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experimento de Discriminación con Ruido</title>
+    <title>Experimento de Discriminación Auditiva con Ruido</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/favicon.svg">
 </head>
 <body>
     <div class="container">
-        <h1>Experimento de Discriminación con Ruido</h1>
-        
-        <div class="selection-section">
-            <h2>Selección de Audio</h2>
-            <label for="audio-select">Selecciona el audio:</label>
-            <select id="audio-select">
-                <option value="">-- Selecciona una opción --</option>
-            </select>
-        </div>
+        <header>
+            <h1>Experimento de Discriminación Auditiva</h1>
+            <p class="subtitle">Medición de tiempo de respuesta con diferentes niveles de ruido</p>
+        </header>
 
-        <div class="experiment-section" id="experiment-section" style="display: none;">
-            <div class="progress-info">
-                <p>Palabra <span id="current-word-number">0</span> de 15</p>
-                <p>Tiempo acumulado: <span id="total-time">0.00</span> segundos</p>
-            </div>
+        <main>
+            <section class="audio-selection">
+                <h2>Selección de Audio</h2>
+                <div class="form-group">
+                    <label for="audioSelect">Selecciona la combinación de lista y nivel de ruido:</label>
+                    <select id="audioSelect" class="audio-selector">
+                        <option value="">-- Selecciona un audio --</option>
+                        <optgroup label="Lista 1 (3 sílabas)">
+                            <option value="lista1-3sil-112.2018">Lista 1 (3 sílabas) - Ruido 112.20%</option>
+                            <option value="lista1-3sil-100">Lista 1 (3 sílabas) - Ruido 100%</option>
+                            <option value="lista1-3sil-89.1255">Lista 1 (3 sílabas) - Ruido 89.13%</option>
+                            <option value="lista1-3sil-84.1395">Lista 1 (3 sílabas) - Ruido 84.14%</option>
+                            <option value="lista1-3sil-79.4328">Lista 1 (3 sílabas) - Ruido 79.43%</option>
+                            <option value="lista1-3sil-70.7946">Lista 1 (3 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                        <optgroup label="Lista 2 (3 sílabas)">
+                            <option value="lista2-3sil-112.2018">Lista 2 (3 sílabas) - Ruido 112.20%</option>
+                            <option value="lista2-3sil-100">Lista 2 (3 sílabas) - Ruido 100%</option>
+                            <option value="lista2-3sil-89.1255">Lista 2 (3 sílabas) - Ruido 89.13%</option>
+                            <option value="lista2-3sil-84.1395">Lista 2 (3 sílabas) - Ruido 84.14%</option>
+                            <option value="lista2-3sil-79.4328">Lista 2 (3 sílabas) - Ruido 79.43%</option>
+                            <option value="lista2-3sil-70.7946">Lista 2 (3 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                        <optgroup label="Lista 1 (4 sílabas)">
+                            <option value="lista1-4sil-112.2018">Lista 1 (4 sílabas) - Ruido 112.20%</option>
+                            <option value="lista1-4sil-100">Lista 1 (4 sílabas) - Ruido 100%</option>
+                            <option value="lista1-4sil-89.1255">Lista 1 (4 sílabas) - Ruido 89.13%</option>
+                            <option value="lista1-4sil-84.1395">Lista 1 (4 sílabas) - Ruido 84.14%</option>
+                            <option value="lista1-4sil-79.4328">Lista 1 (4 sílabas) - Ruido 79.43%</option>
+                            <option value="lista1-4sil-70.7946">Lista 1 (4 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                        <optgroup label="Lista 2 (4 sílabas)">
+                            <option value="lista2-4sil-112.2018">Lista 2 (4 sílabas) - Ruido 112.20%</option>
+                            <option value="lista2-4sil-100">Lista 2 (4 sílabas) - Ruido 100%</option>
+                            <option value="lista2-4sil-89.1255">Lista 2 (4 sílabas) - Ruido 89.13%</option>
+                            <option value="lista2-4sil-84.1395">Lista 2 (4 sílabas) - Ruido 84.14%</option>
+                            <option value="lista2-4sil-79.4328">Lista 2 (4 sílabas) - Ruido 79.43%</option>
+                            <option value="lista2-4sil-70.7946">Lista 2 (4 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                        <optgroup label="Lista 1 (5 sílabas)">
+                            <option value="lista1-5sil-112.2018">Lista 1 (5 sílabas) - Ruido 112.20%</option>
+                            <option value="lista1-5sil-100">Lista 1 (5 sílabas) - Ruido 100%</option>
+                            <option value="lista1-5sil-89.1255">Lista 1 (5 sílabas) - Ruido 89.13%</option>
+                            <option value="lista1-5sil-84.1395">Lista 1 (5 sílabas) - Ruido 84.14%</option>
+                            <option value="lista1-5sil-79.4328">Lista 1 (5 sílabas) - Ruido 79.43%</option>
+                            <option value="lista1-5sil-70.7946">Lista 1 (5 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                        <optgroup label="Lista 2 (5 sílabas)">
+                            <option value="lista2-5sil-112.2018">Lista 2 (5 sílabas) - Ruido 112.20%</option>
+                            <option value="lista2-5sil-100">Lista 2 (5 sílabas) - Ruido 100%</option>
+                            <option value="lista2-5sil-89.1255">Lista 2 (5 sílabas) - Ruido 89.13%</option>
+                            <option value="lista2-5sil-84.1395">Lista 2 (5 sílabas) - Ruido 84.14%</option>
+                            <option value="lista2-5sil-79.4328">Lista 2 (5 sílabas) - Ruido 79.43%</option>
+                            <option value="lista2-5sil-70.7946">Lista 2 (5 sílabas) - Ruido 70.79%</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </section>
 
-            <div class="timer-display">
-                <p>Tiempo de palabra actual: <span id="current-time">0.00</span> segundos</p>
-            </div>
+            <section class="experiment-controls">
+                <div class="progress-info">
+                    <h2>Progreso</h2>
+                    <p class="progress-text">Palabra <span id="currentWord">0</span> de 15</p>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
 
-            <div class="controls">
-                <button id="play-button" class="btn btn-primary">Reproducir Palabra</button>
-                <button id="stop-timer-button" class="btn btn-secondary" disabled>Detener Temporizador</button>
-                <button id="reset-button" class="btn btn-danger">Reiniciar Experimento</button>
-            </div>
+                <div class="timer-display">
+                    <h2>Temporizador</h2>
+                    <p class="timer-text"><span id="timerDisplay">0.000</span> segundos</p>
+                </div>
 
-            <div class="word-list">
-                <h3>Palabras Procesadas:</h3>
-                <ul id="word-times-list"></ul>
-            </div>
-        </div>
+                <div class="control-buttons">
+                    <button id="playButton" class="btn btn-primary" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Reproducir Palabra
+                    </button>
+                    <button id="stopButton" class="btn btn-secondary" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="6" width="12" height="12"/>
+                        </svg>
+                        Detener Temporizador
+                    </button>
+                    <button id="resetButton" class="btn btn-tertiary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                            <path d="M3 21v-5h5"/>
+                        </svg>
+                        Reiniciar Experimento
+                    </button>
+                </div>
+            </section>
 
-        <div class="results-section" id="results-section" style="display: none;">
-            <h2>Resultados Finales</h2>
-            <p class="total-result">Tiempo total acumulado: <span id="final-time">0.00</span> segundos</p>
-            <button id="new-experiment-button" class="btn btn-primary">Nuevo Experimento</button>
-        </div>
+            <section class="results">
+                <h2>Resultados</h2>
+                <div id="wordTimes" class="word-times">
+                    <p class="no-data">Los tiempos aparecerán aquí después de cada palabra</p>
+                </div>
+                <div id="totalTime" class="total-time" style="display: none;">
+                    <h3>Tiempo Total Acumulado</h3>
+                    <p class="total-time-value"><span id="totalTimeValue">0.000</span> segundos</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Experimento de Discriminación Auditiva © 2025</p>
+        </footer>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 

@@ -1,330 +1,323 @@
-// Word lists
-const wordLists = {
-    'lista1-3': [
-        'Obstante', 'Brújula', 'Guitarra', 'Comida', 'Fábula',
-        'Rúbrica', 'Cebolla', 'Crónica', 'Escuela', 'Familia',
-        'Vértigo', 'Mochila', 'Cuchara', 'Botella', 'Séquito'
-    ],
-    'lista2-3': [
-        'Palabra', 'Número', 'Mercado', 'Ventana', 'Insignia',
-        'Enigma', 'Diluvio', 'Mañana', 'Camisa', 'Plátano',
-        'Amigo', 'Trabajo', 'Dinero', 'Zapato', 'Naranja'
-    ],
-    'lista1-4': [
-        'Restaurante', 'Bolígrafo', 'Efímero', 'Importante', 'Mandíbula',
-        'Obelisco', 'Monasterio', 'Presidente', 'Carpintero', 'Calendario',
-        'Secretaria', 'Periscopio', 'Cucaracha', 'Kilómetro', 'Semáforo'
-    ],
-    'lista2-4': [
-        'Teléfono', 'Bicicleta', 'Simpático', 'Pentagrama', 'Mariposa',
-        'Diferente', 'Elefante', 'Termómetro', 'Necesario', 'Chocolate',
-        'Catapulta', 'Eucalipto', 'Compañero', 'Televisión', 'Murciélago'
-    ],
-    'lista1-5': [
-        'Especialista', 'Universidad', 'Laboratorio', 'Categórico', 'Caleidoscopio',
-        'Felicidades', 'Oportunidad', 'Estacionamiento', 'Computadora', 'Estetoscopio',
-        'Melancólico', 'Inverosímil', 'Aristocracia', 'Helicóptero', 'Comunicación'
-    ],
-    'lista2-5': [
-        'Investigación', 'Estrafalario', 'Especulación', 'Inteligente', 'Idiosincrasia',
-        'Electricidad', 'Matemáticas', 'Hipopótamo', 'Administración', 'Agradecimiento',
-        'Antibiótico', 'Efervescencia', 'Temperatura', 'Necesidades', 'Experiencia'
-    ]
+// Experimento de Discriminación Auditiva con Ruido
+// Estado de la aplicación
+const state = {
+    selectedAudio: null,
+    currentWord: 0,
+    isPlaying: false,
+    isTimerRunning: false,
+    timerStartTime: null,
+    wordTimes: [],
+    audioContext: null,
+    whiteNoiseSource: null,
+    wordAudio: null,
+    noiseRatio: 1.0,
+    listId: null
 };
 
-const noiseLevels = [
-    { value: 1.0, label: '100%' },
-    { value: 0.841395, label: '84.1395%' },
-    { value: 0.707946, label: '70.7946%' }
-];
+// Mapeo de listas y niveles de ruido
+const noiseRatios = {
+    '112.2018': 1.122018,
+    '100': 1.0,
+    '89.1255': 0.891255,
+    '84.1395': 0.841395,
+    '79.4328': 0.794328,
+    '70.7946': 0.707946
+};
 
-let audioContext;
-let whiteNoiseBuffer;
-let currentAudioSource = null;
-let selectedConfig = null;
-let currentWordIndex = 0;
-let wordTimes = [];
-let timerInterval = null;
-let startTime = null;
-let accumulatedTime = 0;
+// Referencias a elementos del DOM
+const elements = {
+    audioSelect: document.getElementById('audioSelect'),
+    playButton: document.getElementById('playButton'),
+    stopButton: document.getElementById('stopButton'),
+    resetButton: document.getElementById('resetButton'),
+    currentWordDisplay: document.getElementById('currentWord'),
+    timerDisplay: document.getElementById('timerDisplay'),
+    progressFill: document.getElementById('progressFill'),
+    wordTimes: document.getElementById('wordTimes'),
+    totalTime: document.getElementById('totalTime'),
+    totalTimeValue: document.getElementById('totalTimeValue')
+};
 
-// Initialize audio context and create white noise
-async function initAudio() {
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create white noise buffer (5 seconds should be enough for any word)
-        const sampleRate = audioContext.sampleRate;
-        const duration = 5;
-        const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate);
-        const data = buffer.getChannelData(0);
-        
-        for (let i = 0; i < data.length; i++) {
-            data[i] = Math.random() * 2 - 1; // White noise between -1 and 1
+// Inicializar Web Audio API
+function initAudioContext() {
+    if (!state.audioContext) {
+        state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+// Generar ruido blanco
+function createWhiteNoise(duration = 10) {
+    initAudioContext();
+    
+    const bufferSize = state.audioContext.sampleRate * duration;
+    const buffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+    const output = buffer.getChannelData(0);
+    
+    // Generar ruido blanco aleatorio
+    for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+    }
+    
+    return buffer;
+}
+
+// Reproducir ruido blanco
+function playWhiteNoise(volume = 1.0) {
+    if (state.whiteNoiseSource) {
+        state.whiteNoiseSource.stop();
+    }
+    
+    initAudioContext();
+    
+    const noiseBuffer = createWhiteNoise(10);
+    state.whiteNoiseSource = state.audioContext.createBufferSource();
+    state.whiteNoiseSource.buffer = noiseBuffer;
+    state.whiteNoiseSource.loop = true;
+    
+    const gainNode = state.audioContext.createGain();
+    gainNode.gain.value = volume * state.noiseRatio;
+    
+    state.whiteNoiseSource.connect(gainNode);
+    gainNode.connect(state.audioContext.destination);
+    
+    state.whiteNoiseSource.start(0);
+}
+
+// Detener ruido blanco
+function stopWhiteNoise() {
+    if (state.whiteNoiseSource) {
+        try {
+            state.whiteNoiseSource.stop();
+        } catch (e) {
+            // Ya estaba detenido
         }
-        
-        whiteNoiseBuffer = buffer;
-    } catch (error) {
-        console.error('Error initializing audio:', error);
-        alert('Error al inicializar el audio. Asegúrate de que tu navegador soporte Web Audio API.');
+        state.whiteNoiseSource = null;
     }
 }
 
-
-// Populate audio selection dropdown
-function populateAudioSelect() {
-    const select = document.getElementById('audio-select');
-    
-    Object.keys(wordLists).forEach(listKey => {
-        const listInfo = listKey.split('-');
-        const syllables = listInfo[1];
-        const listNum = listInfo[0].replace('lista', 'Lista ');
-        
-        noiseLevels.forEach((noiseLevel, index) => {
-            const option = document.createElement('option');
-            option.value = `${listKey}-${index}`;
-            option.textContent = `${listNum} (${syllables} sílabas) - Ruido ${noiseLevel.label}`;
-            select.appendChild(option);
-        });
-    });
-}
-
-// Start timer
-function startTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
-    
-    startTime = Date.now();
-    
-    timerInterval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        document.getElementById('current-time').textContent = elapsed.toFixed(2);
-    }, 10);
-}
-
-// Stop timer and save time
-function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    
-    if (startTime) {
-        const elapsed = (Date.now() - startTime) / 1000;
-        accumulatedTime += elapsed;
-        wordTimes.push(elapsed);
-        
-        const word = selectedConfig.words[currentWordIndex];
-        displayWordTime(word, elapsed);
-        
-        startTime = null;
-        document.getElementById('current-time').textContent = '0.00';
-        document.getElementById('total-time').textContent = accumulatedTime.toFixed(2);
-    }
-}
-
-// Display word time in the list
-function displayWordTime(word, time) {
-    const list = document.getElementById('word-times-list');
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="word-name">${word}</span> <span class="word-time">${time.toFixed(2)}s</span>`;
-    list.appendChild(li);
-}
-
-// Play current word
-async function playCurrentWord() {
-    if (currentWordIndex >= selectedConfig.words.length) {
-        showFinalResults();
+// Reproducir audio de palabra
+function playWordAudio() {
+    if (!state.listId || state.currentWord >= 15) {
         return;
     }
     
-    const word = selectedConfig.words[currentWordIndex];
+    const wordNumber = String(state.currentWord + 1).padStart(2, '0');
+    const audioPath = `public/audio/words/${state.listId}/palabra${wordNumber}.mp3`;
     
-    try {
-        // Stop any previous audio
-        speechSynthesis.cancel();
-        if (currentAudioSource) {
-            currentAudioSource.stop();
-            currentAudioSource = null;
-        }
+    state.wordAudio = new Audio(audioPath);
+    
+    state.wordAudio.addEventListener('loadedmetadata', () => {
+        // Iniciar reproducción
+        state.wordAudio.play().catch(error => {
+            console.error('Error al reproducir audio:', error);
+            // Si falla la carga del audio, continuar con sonido de prueba
+            alert('No se pudo cargar el audio. Asegúrate de que los archivos de audio estén en la carpeta correcta.');
+        });
         
-        // Create noise gain node for volume control
-        const noiseGainNode = audioContext.createGain();
-        noiseGainNode.gain.value = selectedConfig.noiseLevel;
+        // Reproducir ruido blanco simultáneamente
+        playWhiteNoise(0.5); // Volumen base del ruido
         
-        // Create noise source
-        const noiseSource = audioContext.createBufferSource();
-        noiseSource.buffer = whiteNoiseBuffer;
-        noiseSource.loop = true;
-        noiseSource.connect(noiseGainNode);
-        noiseGainNode.connect(audioContext.destination);
+        // Iniciar temporizador inmediatamente
+        startTimer();
+    });
+    
+    state.wordAudio.addEventListener('ended', () => {
+        // El audio terminó pero el temporizador sigue corriendo
+        // El usuario debe detenerlo manualmente
+    });
+    
+    state.wordAudio.addEventListener('error', (e) => {
+        console.warn('Audio no encontrado, usando modo de prueba');
+        // En modo de prueba, simular reproducción de 2 segundos
+        playWhiteNoise(0.5);
+        startTimer();
         
-        // Create speech synthesis utterance
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'es-ES';
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-        
-        // Start playing noise
-        noiseSource.start(0);
-        currentAudioSource = noiseSource;
-        
-        utterance.onend = () => {
-            // Stop noise when speech ends
-            if (noiseSource && noiseSource.playbackState !== 3) { // 3 = finished
-                noiseSource.stop();
-            }
-            currentAudioSource = null;
-            
-            // Audio stops automatically, now start the timer
-            startTimer();
-            document.getElementById('play-button').disabled = true;
-            document.getElementById('stop-timer-button').disabled = false;
-        };
-        
-        utterance.onerror = (event) => {
-            console.error('Speech synthesis error:', event);
-            if (noiseSource && noiseSource.playbackState !== 3) {
-                noiseSource.stop();
-            }
-            currentAudioSource = null;
-            document.getElementById('play-button').disabled = false;
-        };
-        
-        // Start speech synthesis
-        speechSynthesis.speak(utterance);
-        
-        // Disable play button during playback
-        document.getElementById('play-button').disabled = true;
-        document.getElementById('stop-timer-button').disabled = false;
-        
-    } catch (error) {
-        console.error('Error playing word:', error);
-        alert('Error al reproducir la palabra. Intenta nuevamente.');
-        document.getElementById('play-button').disabled = false;
-        if (currentAudioSource) {
-            currentAudioSource.stop();
-            currentAudioSource = null;
-        }
+        setTimeout(() => {
+            // Audio simulado termina pero temporizador sigue
+        }, 2000);
+    });
+}
+
+// Detener audio de palabra
+function stopWordAudio() {
+    if (state.wordAudio) {
+        state.wordAudio.pause();
+        state.wordAudio.currentTime = 0;
+        state.wordAudio = null;
+    }
+    stopWhiteNoise();
+}
+
+// Iniciar temporizador
+function startTimer() {
+    state.timerStartTime = performance.now();
+    state.isTimerRunning = true;
+    updateTimerDisplay();
+}
+
+// Detener temporizador
+function stopTimer() {
+    if (!state.isTimerRunning) {
+        return;
+    }
+    
+    const elapsedTime = (performance.now() - state.timerStartTime) / 1000;
+    state.isTimerRunning = false;
+    
+    // Almacenar tiempo
+    state.wordTimes.push({
+        word: state.currentWord + 1,
+        time: elapsedTime
+    });
+    
+    // Actualizar UI
+    updateWordTimesDisplay();
+    
+    // Avanzar a siguiente palabra
+    state.currentWord++;
+    updateProgress();
+    
+    // Verificar si terminó el experimento
+    if (state.currentWord >= 15) {
+        finishExperiment();
+    } else {
+        // Habilitar botón de reproducir para siguiente palabra
+        elements.playButton.disabled = false;
+        elements.stopButton.disabled = true;
     }
 }
 
-// Update progress display
+// Actualizar display del temporizador
+function updateTimerDisplay() {
+    if (state.isTimerRunning) {
+        const elapsed = (performance.now() - state.timerStartTime) / 1000;
+        elements.timerDisplay.textContent = elapsed.toFixed(3);
+        requestAnimationFrame(updateTimerDisplay);
+    }
+}
+
+// Actualizar progreso
 function updateProgress() {
-    document.getElementById('current-word-number').textContent = currentWordIndex;
-    
-    if (currentWordIndex >= selectedConfig.words.length) {
-        document.getElementById('play-button').disabled = true;
+    elements.currentWordDisplay.textContent = state.currentWord;
+    const progress = (state.currentWord / 15) * 100;
+    elements.progressFill.style.width = `${progress}%`;
+}
+
+// Actualizar display de tiempos de palabras
+function updateWordTimesDisplay() {
+    if (state.wordTimes.length === 0) {
+        return;
     }
+    
+    if (state.wordTimes.length === 1) {
+        // Remover mensaje de "no data"
+        elements.wordTimes.innerHTML = '';
+    }
+    
+    const lastTime = state.wordTimes[state.wordTimes.length - 1];
+    const timeItem = document.createElement('div');
+    timeItem.className = 'word-time-item';
+    timeItem.innerHTML = `
+        <span class="word-number">Palabra ${lastTime.word}</span>
+        <span class="word-time">${lastTime.time.toFixed(3)} s</span>
+    `;
+    elements.wordTimes.appendChild(timeItem);
+    
+    // Scroll al final
+    elements.wordTimes.scrollTop = elements.wordTimes.scrollHeight;
 }
 
-// Show final results
-function showFinalResults() {
-    document.getElementById('experiment-section').style.display = 'none';
-    document.getElementById('results-section').style.display = 'block';
-    document.getElementById('final-time').textContent = accumulatedTime.toFixed(2);
+// Finalizar experimento
+function finishExperiment() {
+    const totalTime = state.wordTimes.reduce((sum, item) => sum + item.time, 0);
+    elements.totalTimeValue.textContent = totalTime.toFixed(3);
+    elements.totalTime.style.display = 'block';
+    
+    elements.playButton.disabled = true;
+    elements.stopButton.disabled = true;
 }
 
-// Reset experiment
+// Reiniciar experimento
 function resetExperiment() {
-    currentWordIndex = 0;
-    wordTimes = [];
-    accumulatedTime = 0;
-    startTime = null;
+    // Detener audio actual
+    stopWordAudio();
     
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+    // Reiniciar estado
+    state.currentWord = 0;
+    state.isPlaying = false;
+    state.isTimerRunning = false;
+    state.timerStartTime = null;
+    state.wordTimes = [];
+    
+    // Reiniciar UI
+    elements.currentWordDisplay.textContent = '0';
+    elements.timerDisplay.textContent = '0.000';
+    elements.progressFill.style.width = '0%';
+    elements.wordTimes.innerHTML = '<p class="no-data">Los tiempos aparecerán aquí después de cada palabra</p>';
+    elements.totalTime.style.display = 'none';
+    
+    // Habilitar botón de reproducir si hay audio seleccionado
+    if (state.selectedAudio) {
+        elements.playButton.disabled = false;
     }
-    
-    if (currentAudioSource) {
-        currentAudioSource.stop();
-        currentAudioSource = null;
-    }
-    
-    document.getElementById('word-times-list').innerHTML = '';
-    document.getElementById('current-word-number').textContent = '0';
-    document.getElementById('total-time').textContent = '0.00';
-    document.getElementById('current-time').textContent = '0.00';
-    document.getElementById('play-button').disabled = false;
-    document.getElementById('stop-timer-button').disabled = true;
-    document.getElementById('results-section').style.display = 'none';
-    document.getElementById('experiment-section').style.display = 'none';
+    elements.stopButton.disabled = true;
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-    populateAudioSelect();
+// Event Listeners
+elements.audioSelect.addEventListener('change', (e) => {
+    const value = e.target.value;
+    if (!value) {
+        state.selectedAudio = null;
+        state.listId = null;
+        elements.playButton.disabled = true;
+        return;
+    }
     
-    // Initialize audio on first user interaction (browser requirement)
-    const initAudioOnInteraction = async () => {
-        if (!audioContext) {
-            await initAudio();
-        }
-        document.removeEventListener('click', initAudioOnInteraction);
-        document.removeEventListener('touchstart', initAudioOnInteraction);
-    };
+    // Parsear selección: lista1-3sil-112.2018
+    const parts = value.split('-');
+    const listName = parts[0]; // lista1 o lista2
+    const syllables = parts[1]; // 3sil, 4sil, 5sil
+    const noiseLevel = parts[2]; // 112.2018, 100, etc.
     
-    document.addEventListener('click', initAudioOnInteraction, { once: true });
-    document.addEventListener('touchstart', initAudioOnInteraction, { once: true });
+    state.selectedAudio = value;
+    state.listId = `${listName}-${syllables}`;
+    state.noiseRatio = noiseRatios[noiseLevel];
     
-    const audioSelect = document.getElementById('audio-select');
-    const playButton = document.getElementById('play-button');
-    const stopTimerButton = document.getElementById('stop-timer-button');
-    const resetButton = document.getElementById('reset-button');
-    const newExperimentButton = document.getElementById('new-experiment-button');
+    // Reiniciar experimento con nueva selección
+    resetExperiment();
+});
+
+elements.playButton.addEventListener('click', () => {
+    if (!state.selectedAudio || state.currentWord >= 15) {
+        return;
+    }
     
-    audioSelect.addEventListener('change', (e) => {
-        const value = e.target.value;
-        if (value) {
-            const [listKey, noiseIndex] = value.split('-');
-            const words = wordLists[listKey];
-            const noiseLevel = noiseLevels[parseInt(noiseIndex)].value;
-            
-            selectedConfig = {
-                words: words,
-                noiseLevel: noiseLevel,
-                label: audioSelect.options[audioSelect.selectedIndex].text
-            };
-            
-            resetExperiment();
-            document.getElementById('experiment-section').style.display = 'block';
-        }
-    });
+    state.isPlaying = true;
+    elements.playButton.disabled = true;
+    elements.stopButton.disabled = false;
     
-    playButton.addEventListener('click', async () => {
-        // Ensure audio context is initialized
-        if (!audioContext) {
-            await initAudio();
-        }
-        stopTimer(); // Stop previous timer if any
-        await playCurrentWord();
-    });
+    playWordAudio();
+});
+
+elements.stopButton.addEventListener('click', () => {
+    if (!state.isPlaying && !state.isTimerRunning) {
+        return;
+    }
     
-    stopTimerButton.addEventListener('click', () => {
-        stopTimer();
-        currentWordIndex++;
-        updateProgress();
-        
-        if (currentWordIndex >= selectedConfig.words.length) {
-            document.getElementById('play-button').disabled = true;
-            document.getElementById('stop-timer-button').disabled = true;
-            showFinalResults();
-        } else {
-            document.getElementById('play-button').disabled = false;
-            document.getElementById('stop-timer-button').disabled = true;
-        }
-    });
-    
-    resetButton.addEventListener('click', () => {
+    state.isPlaying = false;
+    stopWordAudio();
+    stopTimer();
+});
+
+elements.resetButton.addEventListener('click', () => {
+    if (confirm('¿Estás seguro de que quieres reiniciar el experimento? Se perderán todos los datos.')) {
         resetExperiment();
-    });
-    
-    newExperimentButton.addEventListener('click', () => {
-        resetExperiment();
-        audioSelect.value = '';
-    });
+    }
+});
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Aplicación de Discriminación Auditiva iniciada');
+    updateProgress();
 });
 
