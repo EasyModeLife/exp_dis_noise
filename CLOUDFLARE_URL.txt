@@ -1,0 +1,31 @@
+# URL del Proyecto Desplegado en Cloudflare Pages
+
+## URL del Proyecto
+
+**https://exp-dis-noise.pages.dev**
+
+El proyecto ha sido desplegado exitosamente en Cloudflare Pages.
+
+## Verificación
+
+Para verificar el despliegue y obtener la URL exacta:
+
+1. Ve a https://dash.cloudflare.com/
+2. Navega a **Workers & Pages** → **Pages**
+3. Busca el proyecto **exp-dis-noise**
+4. La URL estará visible en la página del proyecto
+
+## Comandos útiles
+
+```bash
+# Ver lista de proyectos
+bun wrangler pages project list
+
+# Ver deployments del proyecto
+bun wrangler pages deployment list --project-name=exp-dis-noise
+
+# Hacer nuevo deploy
+cd /home/sonnyboy/Documents/exp_dis_noise
+bun wrangler pages deploy . --project-name=exp-dis-noise
+```
+
