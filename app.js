@@ -3,6 +3,8 @@
 const state = {
     listId: null,
     noiseLevel: null,
+    participantName: '',
+    experimentDate: null,
     currentWord: 0,
     isPlaying: false,
     isTimerRunning: false,
@@ -79,6 +81,7 @@ function getNoiseRatio(noiseLevel) {
 // Referencias a elementos del DOM
 const elements = {
     // Selectores principales
+    participantNameInput: document.getElementById('participantName'),
     listSelect: document.getElementById('listSelect'),
     noiseSelect: document.getElementById('noiseSelect'),
     customNoiseGroup: document.getElementById('customNoiseGroup'),
@@ -411,6 +414,7 @@ function resetExperiment() {
     state.elapsedTime = 0;
     state.wordTimes = [];
     state.waitingForResponse = false;
+    // No resetear participantName ni experimentDate al reiniciar el experimento
     
     elements.currentWordDisplay.textContent = '0';
     elements.timerDisplay.textContent = '0.000';
@@ -456,6 +460,10 @@ function updatePlayPauseButton(isPlaying) {
 
 // Entrar en modo pantalla completa
 function enterFullscreen() {
+    // Guardar nombre del participante y fecha
+    state.participantName = elements.participantNameInput.value.trim();
+    state.experimentDate = new Date();
+    
     state.isFullscreen = true;
     elements.fullscreenMode.style.display = 'block';
     elements.mainContainer.style.display = 'none';
@@ -504,12 +512,25 @@ async function copyResults() {
     
     const listName = state.listId;
     const noiseLevel = state.noiseLevel;
+    const participantName = state.participantName || 'No especificado';
+    const experimentDate = state.experimentDate || new Date();
     const totalTime = state.wordTimes.reduce((sum, item) => sum + item.time, 0);
     const correctCount = state.wordTimes.filter(item => item.correct === true).length;
     const incorrectCount = state.wordTimes.filter(item => item.correct === false).length;
     
+    // Formatear fecha de forma legible
+    const dateStr = experimentDate.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
     let text = `Experimento de Discriminación Auditiva\n`;
     text += `========================================\n\n`;
+    text += `Participante: ${participantName}\n`;
+    text += `Fecha: ${dateStr}\n`;
     text += `Lista: ${listName}\n`;
     text += `Nivel de ruido: ${noiseLevel}%\n`;
     text += `Correctas: ${correctCount} | Incorrectas: ${incorrectCount}\n\n`;
@@ -524,7 +545,6 @@ async function copyResults() {
     text += `\n-----------\n`;
     text += `Tiempo total: ${totalTime.toFixed(3)} segundos\n`;
     text += `Precisión: ${correctCount}/${state.wordTimes.length} (${((correctCount / state.wordTimes.length) * 100).toFixed(1)}%)\n`;
-    text += `\nFecha: ${new Date().toLocaleString('es-ES')}`;
     
     try {
         await navigator.clipboard.writeText(text);
@@ -548,6 +568,11 @@ async function copyResults() {
 }
 
 // Event Listeners
+elements.participantNameInput.addEventListener('input', () => {
+    state.participantName = elements.participantNameInput.value.trim();
+    checkStartButton();
+});
+
 elements.listSelect.addEventListener('change', (e) => {
     const value = e.target.value;
     if (value) {
@@ -599,7 +624,9 @@ elements.customNoiseInput.addEventListener('input', (e) => {
 });
 
 function checkStartButton() {
-    elements.startExperimentBtn.disabled = !(state.listId && state.noiseLevel !== null);
+    const hasParticipantName = state.participantName.trim().length > 0;
+    const hasListAndNoise = state.listId && state.noiseLevel !== null;
+    elements.startExperimentBtn.disabled = !(hasParticipantName && hasListAndNoise);
 }
 
 elements.startExperimentBtn.addEventListener('click', () => {
