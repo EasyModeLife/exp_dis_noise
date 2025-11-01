@@ -8,7 +8,8 @@
 
 ### Cloudflare Pages
 - **Proyecto**: exp-dis-noise
-- **URL esperada**: https://exp-dis-noise.pages.dev
+- **URL de producción**: https://bca4b96c.exp-dis-noise.pages.dev
+- **URL personalizada**: https://exp-dis-noise.pages.dev (puede variar)
 - **Account ID**: 2c3d1df31d34ec4a881f270c81e493db
 
 > **Nota**: Para verificar la URL exacta de tu despliegue, visita el dashboard de Cloudflare Pages en: https://dash.cloudflare.com
@@ -124,8 +125,8 @@ public/audio/words/
 - [x] Push a GitHub
 - [x] Despliegue inicial a Cloudflare Pages
 - [x] Generar audios con ElevenLabs (90/90 archivos)
-- [ ] Subir audios al proyecto
-- [ ] Desplegar versión completa
+- [x] Subir audios al proyecto (commit dc5906c)
+- [x] Desplegar versión completa a Cloudflare Pages
 - [ ] Pruebas del experimento completo
 
 ---

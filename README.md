@@ -21,6 +21,12 @@ Este experimento evalúa la capacidad de reconocimiento auditivo de palabras cua
 - ✅ Interfaz moderna y responsiva
 - ✅ 36 combinaciones de audio predefinidas
 
+## 🌐 Aplicación en Vivo
+
+**🚀 URL de producción**: https://bca4b96c.exp-dis-noise.pages.dev
+
+La aplicación está completamente funcional con los 90 audios generados y lista para ser utilizada.
+
 ## 🚀 Inicio Rápido
 
 ### Desarrollo Local
