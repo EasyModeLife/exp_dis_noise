@@ -7,12 +7,14 @@ const state = {
     isPlaying: false,
     isTimerRunning: false,
     timerStartTime: null,
+    elapsedTime: 0,  // Tiempo acumulado cuando se pausa
     wordTimes: [],
     audioContext: null,
     whiteNoiseSource: null,
     wordAudio: null,
     noiseRatio: 1.0,
-    isFullscreen: false
+    isFullscreen: false,
+    waitingForResponse: false  // Indica si estamos esperando respuesta (correcto/incorrecto)
 };
 
 // Definición de palabras por lista
@@ -200,6 +202,8 @@ function playWordAudio() {
         }
         
         // Iniciar temporizador inmediatamente
+        state.elapsedTime = 0; // Resetear tiempo acumulado
+        state.waitingForResponse = false;
         startTimer();
         
         // Actualizar UI del botón
@@ -207,7 +211,20 @@ function playWordAudio() {
     });
     
     state.wordAudio.addEventListener('ended', () => {
-        // El audio terminó pero el temporizador sigue corriendo
+        // El audio terminó, pausar timer y mostrar botones de respuesta
+        stopWordAudio();
+        pauseTimer();
+        updatePlayPauseButton(false);
+        
+        // Mostrar botones de respuesta
+        if (state.isFullscreen) {
+            elements.fullscreenPlayPauseBtn.style.display = 'none';
+            elements.fullscreenResponseButtons.style.display = 'flex';
+            state.waitingForResponse = true;
+        }
+        
+        // Actualizar display del timer con el tiempo pausado
+        updateTimerDisplay();
     });
     
     state.wordAudio.addEventListener('error', (e) => {
@@ -230,18 +247,41 @@ function stopWordAudio() {
 // Iniciar temporizador
 function startTimer() {
     state.timerStartTime = performance.now();
+    state.elapsedTime = 0; // Resetear tiempo acumulado
     state.isTimerRunning = true;
+    state.waitingForResponse = false;
     updateTimerDisplay();
 }
 
-// Detener temporizador
-function stopTimer(isCorrect = null) {
-    if (!state.isTimerRunning) {
-        return;
+// Pausar temporizador (cuando se detiene el audio)
+function pauseTimer() {
+    if (state.isTimerRunning && state.timerStartTime) {
+        state.elapsedTime = (performance.now() - state.timerStartTime) / 1000;
+        state.isTimerRunning = false;
+    }
+}
+
+// Guardar tiempo y avanzar (cuando se presiona correcto/incorrecto)
+function saveTimerResult(isCorrect) {
+    // Calcular tiempo final (usar tiempo acumulado si existe, sino calcular desde inicio)
+    let finalTime = 0;
+    
+    if (state.isTimerRunning && state.timerStartTime) {
+        // Si el timer aún está corriendo, calcular tiempo total
+        finalTime = (performance.now() - state.timerStartTime) / 1000;
+        state.isTimerRunning = false;
+    } else if (state.elapsedTime > 0) {
+        // Usar el tiempo que se guardó al pausar
+        finalTime = state.elapsedTime;
+    } else if (state.timerStartTime) {
+        // Fallback: calcular desde el inicio si hay tiempo de inicio
+        finalTime = (performance.now() - state.timerStartTime) / 1000;
     }
     
-    const elapsedTime = (performance.now() - state.timerStartTime) / 1000;
-    state.isTimerRunning = false;
+    // Resetear estado del timer
+    state.elapsedTime = 0;
+    state.timerStartTime = null;
+    state.waitingForResponse = false;
     
     // Almacenar tiempo con nombre de palabra y si fue correcta
     const words = wordLists[state.listId];
@@ -250,12 +290,13 @@ function stopTimer(isCorrect = null) {
     state.wordTimes.push({
         word: state.currentWord + 1,
         wordName: wordName,
-        time: elapsedTime,
+        time: finalTime,
         correct: isCorrect  // true, false, o null si no aplica
     });
     
     // Actualizar UI
     updateWordTimesDisplay();
+    updateTimerDisplay(); // Resetear display a 0.000
     
     // Avanzar a siguiente palabra automáticamente
     state.currentWord++;
@@ -272,21 +313,26 @@ function stopTimer(isCorrect = null) {
         }
     }
     
-    return elapsedTime;
+    return finalTime;
 }
 
 // Actualizar display del temporizador
 function updateTimerDisplay() {
-    if (state.isTimerRunning) {
+    let timeStr = '0.000';
+    
+    if (state.isTimerRunning && state.timerStartTime) {
+        // Timer corriendo: mostrar tiempo en tiempo real
         const elapsed = (performance.now() - state.timerStartTime) / 1000;
-        const timeStr = elapsed.toFixed(3);
-        
-        elements.timerDisplay.textContent = timeStr;
-        if (state.isFullscreen) {
-            elements.fullscreenTimer.textContent = timeStr;
-        }
-        
+        timeStr = elapsed.toFixed(3);
         requestAnimationFrame(updateTimerDisplay);
+    } else if (state.elapsedTime > 0 && !state.isTimerRunning) {
+        // Timer pausado: mostrar tiempo pausado
+        timeStr = state.elapsedTime.toFixed(3);
+    }
+    
+    elements.timerDisplay.textContent = timeStr;
+    if (state.isFullscreen) {
+        elements.fullscreenTimer.textContent = timeStr;
     }
 }
 
@@ -356,12 +402,15 @@ function finishExperiment() {
 // Reiniciar experimento
 function resetExperiment() {
     stopWordAudio();
+    pauseTimer(); // Asegurar que el timer esté detenido
     
     state.currentWord = 0;
     state.isPlaying = false;
     state.isTimerRunning = false;
     state.timerStartTime = null;
+    state.elapsedTime = 0;
     state.wordTimes = [];
+    state.waitingForResponse = false;
     
     elements.currentWordDisplay.textContent = '0';
     elements.timerDisplay.textContent = '0.000';
@@ -376,9 +425,14 @@ function resetExperiment() {
         elements.fullscreenWordNumber.textContent = '—';
         elements.fullscreenProgressFill.style.width = '0%';
         elements.fullscreenNextBtn.disabled = true;
+        
+        // Asegurar que los botones estén en el estado correcto
+        elements.fullscreenResponseButtons.style.display = 'none';
+        elements.fullscreenPlayPauseBtn.style.display = 'flex';
     }
     
     updateProgress();
+    updatePlayPauseButton(false);
 }
 
 // Actualizar botón Play/Pause
@@ -561,7 +615,7 @@ elements.exitFullscreenBtn.addEventListener('click', () => {
 });
 
 elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
-    if (state.currentWord >= 15) {
+    if (state.currentWord >= 15 || state.waitingForResponse) {
         return;
     }
     
@@ -569,30 +623,35 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
         // Reproducir
         playWordAudio();
     } else {
-        // Detener audio y timer, luego mostrar botones de respuesta
+        // Detener audio y pausar timer
         stopWordAudio();
-        
-        // Pausar el timer sin guardarlo aún
-        if (state.isTimerRunning) {
-            state.isTimerRunning = false;
-        }
-        
+        pauseTimer();
         updatePlayPauseButton(false);
         
         // Mostrar botones de correcto/incorrecto
         if (state.isFullscreen) {
             elements.fullscreenPlayPauseBtn.style.display = 'none';
             elements.fullscreenResponseButtons.style.display = 'flex';
+            state.waitingForResponse = true;
         }
+        
+        // Actualizar display del timer con el tiempo pausado
+        updateTimerDisplay();
     }
 });
 
 elements.fullscreenCorrectBtn.addEventListener('click', () => {
-    stopTimer(true);  // Correcto
+    if (!state.waitingForResponse) {
+        return;
+    }
+    saveTimerResult(true);  // Correcto
 });
 
 elements.fullscreenIncorrectBtn.addEventListener('click', () => {
-    stopTimer(false);  // Incorrecto
+    if (!state.waitingForResponse) {
+        return;
+    }
+    saveTimerResult(false);  // Incorrecto
 });
 
 elements.resetButton.addEventListener('click', () => {
