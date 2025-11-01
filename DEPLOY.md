@@ -123,8 +123,9 @@ public/audio/words/
 - [x] Configuración de Wrangler
 - [x] Push a GitHub
 - [x] Despliegue inicial a Cloudflare Pages
-- [ ] Generar audios con ElevenLabs
+- [x] Generar audios con ElevenLabs (90/90 archivos)
 - [ ] Subir audios al proyecto
+- [ ] Desplegar versión completa
 - [ ] Pruebas del experimento completo
 
 ---
