@@ -7,7 +7,58 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <!-- Modo Pantalla Completa del Experimento -->
+    <div id="fullscreenMode" class="fullscreen-mode" style="display: none;">
+        <div class="fullscreen-header">
+            <button id="exitFullscreenBtn" class="exit-fullscreen-btn" title="Salir de pantalla completa">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="fullscreen-content">
+            <div class="fullscreen-progress">
+                <h2>Palabra <span id="fullscreenCurrentWord">1</span> de 15</h2>
+                <div class="progress-bar-fullscreen">
+                    <div id="fullscreenProgressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="fullscreen-timer">
+                <p class="fullscreen-timer-label">Tiempo</p>
+                <p class="fullscreen-timer-value"><span id="fullscreenTimer">0.000</span> s</p>
+            </div>
+
+            <div class="fullscreen-word">
+                <p class="word-number-text">Palabra</p>
+                <p class="word-number-large" id="fullscreenWordNumber">1</p>
+            </div>
+
+            <div class="fullscreen-controls">
+                <button id="fullscreenPlayPauseBtn" class="fullscreen-btn fullscreen-btn-play">
+                    <svg id="fullscreenPlayIcon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg id="fullscreenPauseIcon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <rect x="6" y="5" width="4" height="14" rx="1"/>
+                        <rect x="14" y="5" width="4" height="14" rx="1"/>
+                    </svg>
+                    <span id="fullscreenPlayPauseText">Reproducir</span>
+                </button>
+                
+                <button id="fullscreenNextBtn" class="fullscreen-btn fullscreen-btn-secondary" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                    <span>Siguiente</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interfaz Principal -->
+    <div class="container" id="mainContainer">
         <header>
             <h1>Experimento de Discriminación Auditiva</h1>
             <p class="subtitle">Medición de tiempo de respuesta con diferentes niveles de ruido</p>
@@ -15,66 +66,55 @@
 
         <main>
             <section class="audio-selection">
-                <h2>Selección de Audio</h2>
-                <div class="form-group">
-                    <label for="audioSelect">Selecciona la combinación de lista y nivel de ruido:</label>
-                    <select id="audioSelect" class="audio-selector">
-                        <option value="">-- Selecciona un audio --</option>
-                        <optgroup label="Lista 1 (3 sílabas)">
-                            <option value="lista1-3sil-112.2018">Lista 1 (3 sílabas) - Ruido 112.20%</option>
-                            <option value="lista1-3sil-100">Lista 1 (3 sílabas) - Ruido 100%</option>
-                            <option value="lista1-3sil-89.1255">Lista 1 (3 sílabas) - Ruido 89.13%</option>
-                            <option value="lista1-3sil-84.1395">Lista 1 (3 sílabas) - Ruido 84.14%</option>
-                            <option value="lista1-3sil-79.4328">Lista 1 (3 sílabas) - Ruido 79.43%</option>
-                            <option value="lista1-3sil-70.7946">Lista 1 (3 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                        <optgroup label="Lista 2 (3 sílabas)">
-                            <option value="lista2-3sil-112.2018">Lista 2 (3 sílabas) - Ruido 112.20%</option>
-                            <option value="lista2-3sil-100">Lista 2 (3 sílabas) - Ruido 100%</option>
-                            <option value="lista2-3sil-89.1255">Lista 2 (3 sílabas) - Ruido 89.13%</option>
-                            <option value="lista2-3sil-84.1395">Lista 2 (3 sílabas) - Ruido 84.14%</option>
-                            <option value="lista2-3sil-79.4328">Lista 2 (3 sílabas) - Ruido 79.43%</option>
-                            <option value="lista2-3sil-70.7946">Lista 2 (3 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                        <optgroup label="Lista 1 (4 sílabas)">
-                            <option value="lista1-4sil-112.2018">Lista 1 (4 sílabas) - Ruido 112.20%</option>
-                            <option value="lista1-4sil-100">Lista 1 (4 sílabas) - Ruido 100%</option>
-                            <option value="lista1-4sil-89.1255">Lista 1 (4 sílabas) - Ruido 89.13%</option>
-                            <option value="lista1-4sil-84.1395">Lista 1 (4 sílabas) - Ruido 84.14%</option>
-                            <option value="lista1-4sil-79.4328">Lista 1 (4 sílabas) - Ruido 79.43%</option>
-                            <option value="lista1-4sil-70.7946">Lista 1 (4 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                        <optgroup label="Lista 2 (4 sílabas)">
-                            <option value="lista2-4sil-112.2018">Lista 2 (4 sílabas) - Ruido 112.20%</option>
-                            <option value="lista2-4sil-100">Lista 2 (4 sílabas) - Ruido 100%</option>
-                            <option value="lista2-4sil-89.1255">Lista 2 (4 sílabas) - Ruido 89.13%</option>
-                            <option value="lista2-4sil-84.1395">Lista 2 (4 sílabas) - Ruido 84.14%</option>
-                            <option value="lista2-4sil-79.4328">Lista 2 (4 sílabas) - Ruido 79.43%</option>
-                            <option value="lista2-4sil-70.7946">Lista 2 (4 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                        <optgroup label="Lista 1 (5 sílabas)">
-                            <option value="lista1-5sil-112.2018">Lista 1 (5 sílabas) - Ruido 112.20%</option>
-                            <option value="lista1-5sil-100">Lista 1 (5 sílabas) - Ruido 100%</option>
-                            <option value="lista1-5sil-89.1255">Lista 1 (5 sílabas) - Ruido 89.13%</option>
-                            <option value="lista1-5sil-84.1395">Lista 1 (5 sílabas) - Ruido 84.14%</option>
-                            <option value="lista1-5sil-79.4328">Lista 1 (5 sílabas) - Ruido 79.43%</option>
-                            <option value="lista1-5sil-70.7946">Lista 1 (5 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                        <optgroup label="Lista 2 (5 sílabas)">
-                            <option value="lista2-5sil-112.2018">Lista 2 (5 sílabas) - Ruido 112.20%</option>
-                            <option value="lista2-5sil-100">Lista 2 (5 sílabas) - Ruido 100%</option>
-                            <option value="lista2-5sil-89.1255">Lista 2 (5 sílabas) - Ruido 89.13%</option>
-                            <option value="lista2-5sil-84.1395">Lista 2 (5 sílabas) - Ruido 84.14%</option>
-                            <option value="lista2-5sil-79.4328">Lista 2 (5 sílabas) - Ruido 79.43%</option>
-                            <option value="lista2-5sil-70.7946">Lista 2 (5 sílabas) - Ruido 70.79%</option>
-                        </optgroup>
-                    </select>
+                <h2>Configuración del Experimento</h2>
+                
+                <div class="selection-grid">
+                    <div class="form-group">
+                        <label for="listSelect">Lista de Palabras:</label>
+                        <select id="listSelect" class="audio-selector">
+                            <option value="">-- Selecciona una lista --</option>
+                            <optgroup label="3 Sílabas">
+                                <option value="lista1-3sil">Lista 1 (3 sílabas)</option>
+                                <option value="lista2-3sil">Lista 2 (3 sílabas)</option>
+                            </optgroup>
+                            <optgroup label="4 Sílabas">
+                                <option value="lista1-4sil">Lista 1 (4 sílabas)</option>
+                                <option value="lista2-4sil">Lista 2 (4 sílabas)</option>
+                            </optgroup>
+                            <optgroup label="5 Sílabas">
+                                <option value="lista1-5sil">Lista 1 (5 sílabas)</option>
+                                <option value="lista2-5sil">Lista 2 (5 sílabas)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="noiseSelect">Nivel de Ruido:</label>
+                        <select id="noiseSelect" class="audio-selector" disabled>
+                            <option value="">-- Selecciona nivel de ruido --</option>
+                            <option value="0">0% - Sin ruido</option>
+                            <option value="70.7946">70.79% - Significativamente menor</option>
+                            <option value="79.4328">79.43% - Notablemente menor</option>
+                            <option value="84.1395">84.14% - Moderadamente menor</option>
+                            <option value="89.1255">89.13% - Ligeramente menor</option>
+                            <option value="100">100% - Igual al volumen</option>
+                            <option value="112.2018">112.20% - Más alto que palabras</option>
+                        </select>
+                    </div>
                 </div>
+
+                <button id="startExperimentBtn" class="btn btn-primary btn-large" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M8 12h8M12 8v8"/>
+                    </svg>
+                    Iniciar Experimento en Pantalla Completa
+                </button>
             </section>
 
-            <section class="experiment-controls">
-                <div class="progress-info">
-                    <h2>Progreso</h2>
+            <section class="experiment-preview">
+                <div class="preview-info">
+                    <h2>Progreso del Experimento</h2>
                     <p class="progress-text">Palabra <span id="currentWord">0</span> de 15</p>
                     <div class="progress-bar">
                         <div id="progressFill" class="progress-fill"></div>
@@ -82,37 +122,22 @@
                 </div>
 
                 <div class="timer-display">
-                    <h2>Temporizador</h2>
+                    <h3>Temporizador Actual</h3>
                     <p class="timer-text"><span id="timerDisplay">0.000</span> segundos</p>
-                </div>
-
-                <div class="control-buttons">
-                    <button id="playButton" class="btn btn-primary" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        Reproducir Palabra
-                    </button>
-                    <button id="stopButton" class="btn btn-secondary" disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="6" y="6" width="12" height="12"/>
-                        </svg>
-                        Detener Temporizador
-                    </button>
-                    <button id="resetButton" class="btn btn-tertiary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                            <path d="M21 3v5h-5"/>
-                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                            <path d="M3 21v-5h5"/>
-                        </svg>
-                        Reiniciar Experimento
-                    </button>
                 </div>
             </section>
 
             <section class="results">
-                <h2>Resultados</h2>
+                <div class="results-header">
+                    <h2>Resultados</h2>
+                    <button id="copyResultsBtn" class="btn btn-copy" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Copiar Resultados
+                    </button>
+                </div>
                 <div id="wordTimes" class="word-times">
                     <p class="no-data">Los tiempos aparecerán aquí después de cada palabra</p>
                 </div>
@@ -120,6 +145,18 @@
                     <h3>Tiempo Total Acumulado</h3>
                     <p class="total-time-value"><span id="totalTimeValue">0.000</span> segundos</p>
                 </div>
+            </section>
+
+            <section class="controls-section">
+                <button id="resetButton" class="btn btn-tertiary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                    Reiniciar Experimento
+                </button>
             </section>
         </main>
 
@@ -131,4 +168,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
