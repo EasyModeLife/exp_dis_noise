@@ -52,6 +52,7 @@ const wordLists = {
 // Mapeo de niveles de ruido (valor del select -> ratio de volumen)
 const noiseRatios = {
     '0': 0,              // Sin ruido
+    '33.33': 0.3333,     // Muy bajo
     '70.7946': 0.707946,
     '79.4328': 0.794328,
     '84.1395': 0.841395,
@@ -89,7 +90,10 @@ const elements = {
     fullscreenNextBtn: document.getElementById('fullscreenNextBtn'),
     fullscreenPlayIcon: document.getElementById('fullscreenPlayIcon'),
     fullscreenPauseIcon: document.getElementById('fullscreenPauseIcon'),
-    fullscreenPlayPauseText: document.getElementById('fullscreenPlayPauseText')
+    fullscreenPlayPauseText: document.getElementById('fullscreenPlayPauseText'),
+    fullscreenResponseButtons: document.getElementById('fullscreenResponseButtons'),
+    fullscreenCorrectBtn: document.getElementById('fullscreenCorrectBtn'),
+    fullscreenIncorrectBtn: document.getElementById('fullscreenIncorrectBtn')
 };
 
 // Inicializar Web Audio API
@@ -216,7 +220,7 @@ function startTimer() {
 }
 
 // Detener temporizador
-function stopTimer() {
+function stopTimer(isCorrect = null) {
     if (!state.isTimerRunning) {
         return;
     }
@@ -224,22 +228,33 @@ function stopTimer() {
     const elapsedTime = (performance.now() - state.timerStartTime) / 1000;
     state.isTimerRunning = false;
     
-    // Almacenar tiempo con nombre de palabra
+    // Almacenar tiempo con nombre de palabra y si fue correcta
     const words = wordLists[state.listId];
     const wordName = words[state.currentWord];
     
     state.wordTimes.push({
         word: state.currentWord + 1,
         wordName: wordName,
-        time: elapsedTime
+        time: elapsedTime,
+        correct: isCorrect  // true, false, o null si no aplica
     });
     
     // Actualizar UI
     updateWordTimesDisplay();
     
-    // Habilitar botón siguiente
-    if (state.isFullscreen) {
-        elements.fullscreenNextBtn.disabled = false;
+    // Avanzar a siguiente palabra automáticamente
+    state.currentWord++;
+    updateProgress();
+    
+    if (state.currentWord >= 15) {
+        finishExperiment();
+    } else {
+        // Preparar para siguiente palabra
+        updatePlayPauseButton(false);
+        if (state.isFullscreen) {
+            elements.fullscreenResponseButtons.style.display = 'none';
+            elements.fullscreenPlayPauseBtn.style.display = 'flex';
+        }
     }
     
     return elapsedTime;
@@ -287,8 +302,17 @@ function updateWordTimesDisplay() {
     const lastTime = state.wordTimes[state.wordTimes.length - 1];
     const timeItem = document.createElement('div');
     timeItem.className = 'word-time-item';
+    
+    // Determinar ícono de correcto/incorrecto
+    let correctIcon = '';
+    if (lastTime.correct === true) {
+        correctIcon = '<span class="correct-icon" title="Correcto">✓</span>';
+    } else if (lastTime.correct === false) {
+        correctIcon = '<span class="incorrect-icon" title="Incorrecto">✗</span>';
+    }
+    
     timeItem.innerHTML = `
-        <span class="word-number">${lastTime.word}. ${lastTime.wordName}</span>
+        <span class="word-number">${lastTime.word}. ${lastTime.wordName} ${correctIcon}</span>
         <span class="word-time">${lastTime.time.toFixed(3)} s</span>
     `;
     elements.wordTimes.appendChild(timeItem);
@@ -412,20 +436,25 @@ async function copyResults() {
     const listName = state.listId;
     const noiseLevel = state.noiseLevel;
     const totalTime = state.wordTimes.reduce((sum, item) => sum + item.time, 0);
+    const correctCount = state.wordTimes.filter(item => item.correct === true).length;
+    const incorrectCount = state.wordTimes.filter(item => item.correct === false).length;
     
     let text = `Experimento de Discriminación Auditiva\n`;
     text += `========================================\n\n`;
     text += `Lista: ${listName}\n`;
-    text += `Nivel de ruido: ${noiseLevel}%\n\n`;
+    text += `Nivel de ruido: ${noiseLevel}%\n`;
+    text += `Correctas: ${correctCount} | Incorrectas: ${incorrectCount}\n\n`;
     text += `Resultados:\n`;
     text += `-----------\n\n`;
     
     state.wordTimes.forEach(item => {
-        text += `${item.word}. ${item.wordName}: ${item.time.toFixed(3)} s\n`;
+        const correctStr = item.correct === true ? ' ✓' : item.correct === false ? ' ✗' : '';
+        text += `${item.word}. ${item.wordName}${correctStr}: ${item.time.toFixed(3)} s\n`;
     });
     
     text += `\n-----------\n`;
     text += `Tiempo total: ${totalTime.toFixed(3)} segundos\n`;
+    text += `Precisión: ${correctCount}/${state.wordTimes.length} (${((correctCount / state.wordTimes.length) * 100).toFixed(1)}%)\n`;
     text += `\nFecha: ${new Date().toLocaleString('es-ES')}`;
     
     try {
@@ -501,15 +530,24 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
         // Reproducir
         playWordAudio();
     } else {
-        // Detener
+        // Detener audio y mostrar botones de respuesta
         stopWordAudio();
-        stopTimer();
         updatePlayPauseButton(false);
+        
+        // Mostrar botones de correcto/incorrecto
+        if (state.isFullscreen) {
+            elements.fullscreenPlayPauseBtn.style.display = 'none';
+            elements.fullscreenResponseButtons.style.display = 'flex';
+        }
     }
 });
 
-elements.fullscreenNextBtn.addEventListener('click', () => {
-    nextWord();
+elements.fullscreenCorrectBtn.addEventListener('click', () => {
+    stopTimer(true);  // Correcto
+});
+
+elements.fullscreenIncorrectBtn.addEventListener('click', () => {
+    stopTimer(false);  // Incorrecto
 });
 
 elements.resetButton.addEventListener('click', () => {

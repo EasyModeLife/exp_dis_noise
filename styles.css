@@ -306,6 +306,18 @@ section h2 {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
+.correct-icon {
+    color: #10b981;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.incorrect-icon {
+    color: #ef4444;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
 .no-data {
     text-align: center;
     color: var(--text-secondary);
@@ -526,6 +538,33 @@ footer {
 
 .fullscreen-btn-secondary:hover:not(:disabled) {
     background-color: rgba(255, 255, 255, 0.35);
+}
+
+.fullscreen-response-buttons {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.fullscreen-btn-correct {
+    background-color: #10b981;
+    color: white;
+    flex: 1;
+}
+
+.fullscreen-btn-correct:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+.fullscreen-btn-incorrect {
+    background-color: #ef4444;
+    color: white;
+    flex: 1;
+}
+
+.fullscreen-btn-incorrect:hover:not(:disabled) {
+    background-color: #dc2626;
 }
 
 /* Responsive Adjustments */
