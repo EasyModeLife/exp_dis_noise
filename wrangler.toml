@@ -1,7 +1,5 @@
-name = "exp_dis_noise"
-main = "src/index.js"
+name = "exp-dis-noise"
 compatibility_date = "2024-01-01"
 
-[site]
-bucket = "./"
+pages_build_output_dir = "."
 
