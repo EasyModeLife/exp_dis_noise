@@ -333,7 +333,9 @@ function updateTimerDisplay() {
         timeStr = state.elapsedTime.toFixed(3);
     }
     
-    elements.timerDisplay.textContent = timeStr;
+    if (elements.timerDisplay) {
+        elements.timerDisplay.textContent = timeStr;
+    }
     if (state.isFullscreen) {
         elements.fullscreenTimer.textContent = timeStr;
     }
@@ -392,10 +394,6 @@ function updateWordTimesDisplay() {
 
 // Finalizar experimento
 function finishExperiment() {
-    const totalTime = state.wordTimes.reduce((sum, item) => sum + item.time, 0);
-    elements.totalTimeValue.textContent = totalTime.toFixed(3);
-    elements.totalTime.style.display = 'block';
-    
     // Salir del modo pantalla completa
     if (state.isFullscreen) {
         exitFullscreen();
@@ -416,12 +414,19 @@ function resetExperiment() {
     state.waitingForResponse = false;
     // No resetear participantName ni experimentDate al reiniciar el experimento
     
-    elements.currentWordDisplay.textContent = '0';
-    elements.timerDisplay.textContent = '0.000';
-    elements.progressFill.style.width = '0%';
+    if (elements.currentWordDisplay) {
+        elements.currentWordDisplay.textContent = '0';
+    }
+    if (elements.timerDisplay) {
+        elements.timerDisplay.textContent = '0.000';
+    }
+    if (elements.progressFill) {
+        elements.progressFill.style.width = '0%';
+    }
     elements.wordTimes.innerHTML = '<p class="no-data">Los tiempos aparecerán aquí después de cada palabra</p>';
-    elements.totalTime.style.display = 'none';
-    elements.copyResultsBtn.style.display = 'none';
+    if (elements.copyResultsBtn) {
+        elements.copyResultsBtn.style.display = 'none';
+    }
     
     if (state.isFullscreen) {
         elements.fullscreenTimer.textContent = '0.000';

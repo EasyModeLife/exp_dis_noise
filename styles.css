@@ -545,6 +545,8 @@ footer {
     gap: 1.5rem;
     width: 100%;
     max-width: 400px;
+    align-items: center;
+    margin: 0 auto;
 }
 
 .fullscreen-btn {
@@ -608,6 +610,8 @@ footer {
     gap: 1.5rem;
     width: 100%;
     max-width: 500px;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .fullscreen-btn-correct {
