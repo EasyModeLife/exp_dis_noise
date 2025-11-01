@@ -81,12 +81,18 @@ El script usa estos parámetros optimizados para claridad:
 
 ```javascript
 {
-    stability: 0.5,           // Balance entre consistencia y naturalidad
-    similarity_boost: 0.75,   // Mantener características de la voz
-    style: 0.0,               // Sin exageración
-    use_speaker_boost: true   // Mejor calidad de audio
+    model_id: 'eleven_turbo_v2_5',  // Modelo v2.5 Turbo (más rápido y claro)
+    language_code: 'es',            // Español
+    voice_settings: {
+        stability: 0.3,             // Mayor consistencia y claridad
+        similarity_boost: 0.8,      // Alta fidelidad a la voz
+        style: 0.0,                 // Sin exageración
+        use_speaker_boost: true     // Mejor calidad de audio
+    }
 }
 ```
+
+**Nota**: NO se usan Audio Tags (como `[pronunciar con claridad]`) ya que se leen literalmente.
 
 ## 📝 Después de Generar los Audios
 
