@@ -109,7 +109,24 @@
                         <option value="89.1255">89.13% - Ligeramente menor</option>
                         <option value="100">100% - Igual al volumen</option>
                         <option value="112.2018">112.20% - Más alto que palabras</option>
+                        <option value="custom">🎛️ Personalizado</option>
                     </select>
+                    </div>
+
+                    <div class="form-group" id="customNoiseGroup" style="display: none;">
+                        <label for="customNoiseInput">Porcentaje Personalizado (respecto a 100%):</label>
+                        <div class="custom-noise-input-wrapper">
+                            <input 
+                                type="number" 
+                                id="customNoiseInput" 
+                                class="custom-noise-input" 
+                                placeholder="Ej: 25.6, 99.2, 200"
+                                min="0"
+                                step="0.01"
+                            />
+                            <span class="custom-noise-suffix">%</span>
+                        </div>
+                        <small class="input-hint">Ingresa cualquier valor positivo. Ej: 25.6, 50, 150, 200</small>
                     </div>
                 </div>
 

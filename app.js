@@ -49,7 +49,7 @@ const wordLists = {
     ]
 };
 
-// Mapeo de niveles de ruido (valor del select -> ratio de volumen)
+// Mapeo de niveles de ruido predefinidos (valor del select -> ratio de volumen)
 const noiseRatios = {
     '0': 0,              // Sin ruido
     '33.33': 0.3333,     // Muy bajo
@@ -61,11 +61,26 @@ const noiseRatios = {
     '112.2018': 1.122018
 };
 
+// Obtener el ratio de ruido (soporta valores personalizados)
+function getNoiseRatio(noiseLevel) {
+    if (noiseRatios.hasOwnProperty(noiseLevel)) {
+        return noiseRatios[noiseLevel];
+    }
+    // Si es un valor personalizado, convertir porcentaje a ratio
+    const customValue = parseFloat(noiseLevel);
+    if (!isNaN(customValue) && customValue >= 0) {
+        return customValue / 100.0;
+    }
+    return 0;
+}
+
 // Referencias a elementos del DOM
 const elements = {
     // Selectores principales
     listSelect: document.getElementById('listSelect'),
     noiseSelect: document.getElementById('noiseSelect'),
+    customNoiseGroup: document.getElementById('customNoiseGroup'),
+    customNoiseInput: document.getElementById('customNoiseInput'),
     startExperimentBtn: document.getElementById('startExperimentBtn'),
     
     // Interfaz principal
@@ -495,12 +510,36 @@ elements.listSelect.addEventListener('change', (e) => {
 
 elements.noiseSelect.addEventListener('change', (e) => {
     const value = e.target.value;
-    if (value) {
+    
+    if (value === 'custom') {
+        // Mostrar input personalizado
+        elements.customNoiseGroup.style.display = 'block';
+        elements.customNoiseInput.focus();
+        state.noiseLevel = null;
+        checkStartButton();
+    } else if (value) {
+        // Ocultar input personalizado
+        elements.customNoiseGroup.style.display = 'none';
         state.noiseLevel = value;
         state.noiseRatio = noiseRatios[value];
         checkStartButton();
     } else {
+        elements.customNoiseGroup.style.display = 'none';
         state.noiseLevel = null;
+        elements.startExperimentBtn.disabled = true;
+    }
+});
+
+elements.customNoiseInput.addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value);
+    
+    if (!isNaN(value) && value >= 0) {
+        state.noiseLevel = value.toString();
+        state.noiseRatio = value / 100.0;
+        checkStartButton();
+    } else {
+        state.noiseLevel = null;
+        state.noiseRatio = null;
         elements.startExperimentBtn.disabled = true;
     }
 });
@@ -530,8 +569,14 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
         // Reproducir
         playWordAudio();
     } else {
-        // Detener audio y mostrar botones de respuesta
+        // Detener audio y timer, luego mostrar botones de respuesta
         stopWordAudio();
+        
+        // Pausar el timer sin guardarlo aún
+        if (state.isTimerRunning) {
+            state.isTimerRunning = false;
+        }
+        
         updatePlayPauseButton(false);
         
         // Mostrar botones de correcto/incorrecto
