@@ -23,7 +23,7 @@ Este experimento evalúa la capacidad de reconocimiento auditivo de palabras cua
 
 ## 🌐 Aplicación en Vivo
 
-**🚀 URL de producción**: https://bca4b96c.exp-dis-noise.pages.dev
+**🚀 URL de producción**: https://ffbc3673.exp-dis-noise.pages.dev
 
 La aplicación está completamente funcional con los 90 audios generados y lista para ser utilizada.
 
@@ -137,28 +137,39 @@ El ruido blanco se genera dinámicamente y se mezcla con el audio de las palabra
 
 | Nivel | Porcentaje | Descripción |
 |-------|-----------|-------------|
-| 1 | 112.20% | Ruido más alto que las palabras |
-| 2 | 100% | Ruido igual al volumen de las palabras |
-| 3 | 89.13% | Ruido ligeramente menor |
-| 4 | 84.14% | Ruido moderadamente menor |
-| 5 | 79.43% | Ruido notablemente menor |
-| 6 | 70.79% | Ruido significativamente menor |
+| 0 | 0% | Sin ruido (control) |
+| 1 | 33.33% | Muy bajo |
+| 2 | 70.79% | Significativamente menor |
+| 3 | 79.43% | Notablemente menor |
+| 4 | 84.14% | Moderadamente menor |
+| 5 | 89.13% | Ligeramente menor |
+| 6 | 100% | Igual al volumen de las palabras |
+| 7 | 112.20% | Ruido más alto que las palabras |
 
 ## 🧪 Uso del Experimento
 
-1. **Seleccionar Audio**: Elige una de las 36 combinaciones disponibles (lista + nivel de ruido)
+1. **Configurar**: 
+   - Selecciona una lista de palabras (6 opciones)
+   - Selecciona un nivel de ruido (8 opciones: 0%, 33.33%, 70.79%, 79.43%, 84.14%, 89.13%, 100%, 112.20%)
 
-2. **Reproducir Palabra**: Presiona el botón "Reproducir Palabra"
+2. **Iniciar**: Presiona "Iniciar Experimento en Pantalla Completa"
+
+3. **Reproducir**: Presiona el botón verde "Reproducir"
    - El audio de la palabra se reproduce con ruido blanco superpuesto
-   - El temporizador inicia automáticamente
+   - El temporizador inicia automáticamente al comenzar el audio
 
-3. **Detener Temporizador**: Presiona "Detener Temporizador" cuando reconozcas la palabra
-   - Puedes detenerlo antes de que termine el audio si reconoces la palabra anticipadamente
-   - El tiempo se guarda automáticamente
+4. **Responder**: Cuando reconozcas la palabra, presiona el botón correspondiente:
+   - **Verde (✓)** si identificaste correctamente la palabra
+   - **Rojo (✗)** si no pudiste identificarla o te equivocaste
+   - El temporizador se detiene y avanza automáticamente a la siguiente palabra
 
-4. **Continuar**: Repite el proceso para las 15 palabras de la lista
+5. **Continuar**: Repite el proceso para las 15 palabras de la lista
 
-5. **Resultados**: Al finalizar, se muestra el tiempo total acumulado
+6. **Resultados**: Al finalizar, se muestra:
+   - Tiempo total acumulado
+   - Cantidad de respuestas correctas e incorrectas
+   - Porcentaje de precisión
+   - Detalle de cada palabra con su tiempo y resultado
 
 ## 🛠️ Tecnologías
 
