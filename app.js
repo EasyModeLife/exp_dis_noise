@@ -248,7 +248,7 @@ function pauseTimer() {
     }
 }
 
-// Guardar tiempo y avanzar automáticamente
+// Guardar tiempo y marcar listo para siguiente
 function saveTimerResult() {
     // Calcular tiempo final (usar tiempo acumulado si existe, sino calcular desde inicio)
     let finalTime = 0;
@@ -268,7 +268,7 @@ function saveTimerResult() {
     // Resetear estado del timer
     state.elapsedTime = 0;
     state.timerStartTime = null;
-    state.waitingForResponse = false;
+    state.waitingForResponse = true; // Marcar que esperamos que avance a la siguiente
     
     // Almacenar tiempo con nombre de palabra (sin registrar si fue correcta)
     const words = wordLists[state.listId];
@@ -284,15 +284,9 @@ function saveTimerResult() {
     updateWordTimesDisplay();
     updateTimerDisplay(); // Resetear display a 0.000
     
-    // Avanzar a siguiente palabra automáticamente
-    state.currentWord++;
-    updateProgress();
-    
-    if (state.currentWord >= 15) {
-        finishExperiment();
-    } else {
-        // Preparar para siguiente palabra
-        updatePlayPauseButton(false);
+    // Cambiar botón a "Siguiente Palabra"
+    if (state.isFullscreen) {
+        elements.fullscreenPlayPauseText.textContent = 'Siguiente Palabra';
     }
     
     return finalTime;
@@ -621,7 +615,25 @@ elements.exitFullscreenBtn.addEventListener('click', () => {
 });
 
 elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
-    if (state.currentWord >= 15 || state.waitingForResponse) {
+    if (state.currentWord >= 15) {
+        return;
+    }
+    
+    // Si estamos esperando avanzar a la siguiente palabra
+    if (state.waitingForResponse) {
+        // Avanzar a siguiente palabra
+        state.currentWord++;
+        updateProgress();
+        
+        if (state.currentWord >= 15) {
+            finishExperiment();
+            return;
+        }
+        
+        // Resetear estado y reproducir siguiente palabra
+        state.waitingForResponse = false;
+        updatePlayPauseButton(false);
+        playWordAudio();
         return;
     }
     
@@ -633,15 +645,6 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
         stopWordAudio();
         pauseTimer();
         updatePlayPauseButton(false);
-        
-        // Mostrar botones de correcto/incorrecto
-        if (state.isFullscreen) {
-            elements.fullscreenPlayPauseBtn.style.display = 'none';
-            elements.fullscreenResponseButtons.style.display = 'flex';
-            state.waitingForResponse = true;
-        }
-        
-        // Actualizar display del timer con el tiempo pausado
         updateTimerDisplay();
     }
 });
