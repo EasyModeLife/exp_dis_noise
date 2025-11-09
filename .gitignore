@@ -44,10 +44,10 @@ Thumbs.db
 # Scripts con API keys sensibles
 generate_audios.js
 
-# Archivos de audio generados
-public/audio/words/
+# Archivos de audio backup (no necesarios en producción)
 public/audio/words_backup/
 public/audio/words_backup_original/
+public/audio/words_backup_rms/
 
 # Archivos de prueba de audio
 pruebas_audio/
