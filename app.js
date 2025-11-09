@@ -107,7 +107,6 @@ const elements = {
     fullscreenWordNumber: document.getElementById('fullscreenWordNumber'),
     fullscreenProgressFill: document.getElementById('fullscreenProgressFill'),
     fullscreenPlayPauseBtn: document.getElementById('fullscreenPlayPauseBtn'),
-    fullscreenNextBtn: document.getElementById('fullscreenNextBtn'),
     fullscreenPlayIcon: document.getElementById('fullscreenPlayIcon'),
     fullscreenPauseIcon: document.getElementById('fullscreenPauseIcon'),
     fullscreenPlayPauseText: document.getElementById('fullscreenPlayPauseText'),
@@ -179,9 +178,8 @@ function stopWhiteNoise() {
 
 // Obtener nombre de archivo de audio
 function getAudioFilename() {
-    const words = wordLists[state.listId];
-    const word = words[state.currentWord];
-    return `public/audio/words/${state.listId}/${word}.mp3`;
+    const wordNumber = String(state.currentWord + 1).padStart(2, '0');
+    return `public/audio/words/${state.listId}/palabra${wordNumber}.mp3`;
 }
 
 // Reproducir audio de palabra
@@ -433,7 +431,6 @@ function resetExperiment() {
         elements.fullscreenCurrentWord.textContent = '0';
         elements.fullscreenWordNumber.textContent = '—';
         elements.fullscreenProgressFill.style.width = '0%';
-        elements.fullscreenNextBtn.disabled = true;
         
         // Asegurar que los botones estén en el estado correcto
         elements.fullscreenResponseButtons.style.display = 'none';
@@ -504,7 +501,6 @@ function nextWord() {
     } else {
         // Preparar para siguiente palabra
         updatePlayPauseButton(false);
-        elements.fullscreenNextBtn.disabled = true;
     }
 }
 
