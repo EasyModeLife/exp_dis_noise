@@ -268,7 +268,6 @@ function saveTimerResult() {
     // Resetear estado del timer
     state.elapsedTime = 0;
     state.timerStartTime = null;
-    state.waitingForResponse = true; // Marcar que esperamos que avance a la siguiente
     
     // Almacenar tiempo con nombre de palabra (sin registrar si fue correcta)
     const words = wordLists[state.listId];
@@ -283,6 +282,13 @@ function saveTimerResult() {
     // Actualizar UI
     updateWordTimesDisplay();
     updateTimerDisplay(); // Resetear display a 0.000
+    
+    // AHORA sí avanzar a la siguiente palabra
+    state.currentWord++;
+    updateProgress();
+    
+    // Marcar que esperamos que presione "Siguiente Palabra"
+    state.waitingForResponse = true;
     
     // Cambiar botón a "Siguiente Palabra"
     if (state.isFullscreen) {
@@ -621,10 +627,7 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
     
     // Si estamos esperando avanzar a la siguiente palabra
     if (state.waitingForResponse) {
-        // Avanzar a siguiente palabra
-        state.currentWord++;
-        updateProgress();
-        
+        // Verificar si ya terminamos
         if (state.currentWord >= 15) {
             finishExperiment();
             return;
