@@ -56,13 +56,9 @@ const wordLists = {
 // Mapeo de niveles de ruido predefinidos (valor del select -> ratio de volumen)
 const noiseRatios = {
     '0': 0,              // Sin ruido
-    '33.33': 0.3333,     // Muy bajo
-    '70.7946': 0.707946,
-    '79.4328': 0.794328,
-    '84.1395': 0.841395,
-    '89.1255': 0.891255,
-    '100': 1.0,
-    '112.2018': 1.122018
+    '70.7946': 0.707946, // Significativamente menor
+    '100': 1.0,          // Igual al volumen
+    '141.2538': 1.412538 // Más alto que palabras
 };
 
 // Obtener el ratio de ruido (soporta valores personalizados)
@@ -697,4 +693,13 @@ elements.copyResultsBtn.addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Aplicación de Discriminación Auditiva iniciada');
     updateProgress();
+    
+    // Inicializar estado con valor por defecto del selector de ruido
+    const defaultNoiseValue = elements.noiseSelect.value;
+    if (defaultNoiseValue && defaultNoiseValue !== '' && defaultNoiseValue !== 'custom') {
+        state.noiseLevel = defaultNoiseValue;
+        state.noiseRatio = noiseRatios[defaultNoiseValue];
+    }
+    
+    checkStartButton();
 });
