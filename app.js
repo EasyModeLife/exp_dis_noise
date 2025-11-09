@@ -105,10 +105,7 @@ const elements = {
     fullscreenPlayPauseBtn: document.getElementById('fullscreenPlayPauseBtn'),
     fullscreenPlayIcon: document.getElementById('fullscreenPlayIcon'),
     fullscreenPauseIcon: document.getElementById('fullscreenPauseIcon'),
-    fullscreenPlayPauseText: document.getElementById('fullscreenPlayPauseText'),
-    fullscreenResponseButtons: document.getElementById('fullscreenResponseButtons'),
-    fullscreenCorrectBtn: document.getElementById('fullscreenCorrectBtn'),
-    fullscreenIncorrectBtn: document.getElementById('fullscreenIncorrectBtn')
+    fullscreenPlayPauseText: document.getElementById('fullscreenPlayPauseText')
 };
 
 // Inicializar Web Audio API
@@ -208,20 +205,13 @@ function playWordAudio() {
     });
     
     state.wordAudio.addEventListener('ended', () => {
-        // El audio terminó, pausar timer y mostrar botones de respuesta
+        // El audio terminó, detener todo y guardar el tiempo
         stopWordAudio();
         pauseTimer();
         updatePlayPauseButton(false);
         
-        // Mostrar botones de respuesta
-        if (state.isFullscreen) {
-            elements.fullscreenPlayPauseBtn.style.display = 'none';
-            elements.fullscreenResponseButtons.style.display = 'flex';
-            state.waitingForResponse = true;
-        }
-        
-        // Actualizar display del timer con el tiempo pausado
-        updateTimerDisplay();
+        // Guardar el tiempo automáticamente (sin registrar correcto/incorrecto)
+        saveTimerResult();
     });
     
     state.wordAudio.addEventListener('error', (e) => {
@@ -258,8 +248,8 @@ function pauseTimer() {
     }
 }
 
-// Guardar tiempo y avanzar (cuando se presiona correcto/incorrecto)
-function saveTimerResult(isCorrect) {
+// Guardar tiempo y avanzar automáticamente
+function saveTimerResult() {
     // Calcular tiempo final (usar tiempo acumulado si existe, sino calcular desde inicio)
     let finalTime = 0;
     
@@ -280,15 +270,14 @@ function saveTimerResult(isCorrect) {
     state.timerStartTime = null;
     state.waitingForResponse = false;
     
-    // Almacenar tiempo con nombre de palabra y si fue correcta
+    // Almacenar tiempo con nombre de palabra (sin registrar si fue correcta)
     const words = wordLists[state.listId];
     const wordName = words[state.currentWord];
     
     state.wordTimes.push({
         word: state.currentWord + 1,
         wordName: wordName,
-        time: finalTime,
-        correct: isCorrect  // true, false, o null si no aplica
+        time: finalTime
     });
     
     // Actualizar UI
@@ -304,10 +293,6 @@ function saveTimerResult(isCorrect) {
     } else {
         // Preparar para siguiente palabra
         updatePlayPauseButton(false);
-        if (state.isFullscreen) {
-            elements.fullscreenResponseButtons.style.display = 'none';
-            elements.fullscreenPlayPauseBtn.style.display = 'flex';
-        }
     }
     
     return finalTime;
@@ -427,10 +412,6 @@ function resetExperiment() {
         elements.fullscreenCurrentWord.textContent = '0';
         elements.fullscreenWordNumber.textContent = '—';
         elements.fullscreenProgressFill.style.width = '0%';
-        
-        // Asegurar que los botones estén en el estado correcto
-        elements.fullscreenResponseButtons.style.display = 'none';
-        elements.fullscreenPlayPauseBtn.style.display = 'flex';
     }
     
     updateProgress();
@@ -663,20 +644,6 @@ elements.fullscreenPlayPauseBtn.addEventListener('click', () => {
         // Actualizar display del timer con el tiempo pausado
         updateTimerDisplay();
     }
-});
-
-elements.fullscreenCorrectBtn.addEventListener('click', () => {
-    if (!state.waitingForResponse) {
-        return;
-    }
-    saveTimerResult(true);  // Correcto
-});
-
-elements.fullscreenIncorrectBtn.addEventListener('click', () => {
-    if (!state.waitingForResponse) {
-        return;
-    }
-    saveTimerResult(false);  // Incorrecto
 });
 
 elements.resetButton.addEventListener('click', () => {
